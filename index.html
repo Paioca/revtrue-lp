@@ -122,7 +122,7 @@ tailwind.config = {
       <a href="#product" class="hover:text-ac transition-colors">Product</a>
       <a href="#faq" class="hover:text-ac transition-colors">FAQ</a>
     </nav>
-    <a href="#cta-final" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
+    <a href="https://app.revtrue.tech/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
       Get Free Demo →
     </a>
   </div>
@@ -148,17 +148,16 @@ tailwind.config = {
     </p>
 
     <!-- Hero Email Capture -->
-    <form id="hero-form" class="rv d3 max-w-md mx-auto" onsubmit="return handleSubmit(event,'hero')">
+    <div class="rv d3 max-w-md mx-auto">
       <div class="flex gap-2">
-        <input type="email" id="hero-email" required placeholder="Your work email"
+        <input type="email" id="hero-email" aria-label="Seu email" placeholder="Your work email"
           class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
-        <button type="submit" id="hero-btn"
-          class="bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+        <a id="hero-cta" href="https://app.revtrue.tech/login"
+          class="inline-flex items-center bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
-        </button>
+        </a>
       </div>
-      <p id="hero-msg" class="text-xs mt-2 min-h-[18px] transition-all"></p>
-    </form>
+    </div>
 
     <a href="#demo" class="rv d4 inline-flex items-center gap-1.5 text-[13px] text-tx2 hover:text-ac transition-colors font-medium mt-3">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21"/></svg>
@@ -580,17 +579,16 @@ tailwind.config = {
     </h2>
     <p class="rv d1 text-[15px] text-tx2 mb-8">Upload your CRM data. Get the diagnosis your Monday meeting needs.</p>
 
-    <form id="cta-form" class="rv d2 max-w-md mx-auto mb-6" onsubmit="return handleSubmit(event,'cta')">
+    <div id="cta-form" class="rv d2 max-w-md mx-auto mb-6">
       <div class="flex gap-2">
-        <input type="email" id="cta-email" required placeholder="Your work email"
+        <input type="email" id="email" aria-label="Seu email" placeholder="Your work email"
           class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
-        <button type="submit" id="cta-btn"
-          class="bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+        <a id="cta" href="https://app.revtrue.tech/login"
+          class="inline-flex items-center bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
-        </button>
+        </a>
       </div>
-      <p id="cta-msg" class="text-xs mt-2 min-h-[18px]"></p>
-    </form>
+    </div>
 
     <div class="rv d3 flex flex-wrap items-center justify-center gap-5">
       <span class="flex items-center gap-1.5 text-xs font-semibold text-gn"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Free to start</span>
@@ -617,7 +615,7 @@ tailwind.config = {
 
 <!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
 <div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
-  <a href="#cta-final" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
+  <a href="https://app.revtrue.tech/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
 </div>
 
 
@@ -634,34 +632,21 @@ new IntersectionObserver(([e]) => smEl.classList.toggle('show',!e.isIntersecting
 /* ——— FAQ ——— */
 function togFaq(btn){const i=btn.closest('.faq-item'),o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open')}
 
-/* ——— Email Validation ——— */
-function handleSubmit(e,id){
-  e.preventDefault();
-  const inp=document.getElementById(id+'-email'), msg=document.getElementById(id+'-msg'), btn=document.getElementById(id+'-btn');
-  const v=inp.value.trim();
-  msg.textContent=''; msg.className='text-xs mt-2 min-h-[18px]';
-  // format
-  if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){
-    msg.textContent='Please enter a valid email address.';
-    msg.classList.add('text-rd','font-medium');
-    inp.style.borderColor='#D94F3D';
-    setTimeout(()=>inp.style.borderColor='',2000);
-    return false;
-  }
-  // block personal
-  const bl=['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'];
-  const dom=v.split('@')[1]?.toLowerCase();
-  if(bl.includes(dom)){
-    msg.textContent='Please use your work email for access.';
-    msg.classList.add('text-ac','font-medium');
-    return false;
-  }
-  // success
-  msg.innerHTML='<span class="text-gn font-semibold">✓ We\'ll send your access link shortly!</span>';
-  inp.value=''; inp.disabled=true;
-  btn.textContent='Sent ✓'; btn.disabled=true; btn.classList.add('opacity-60','cursor-default');
-  return false;
+/* ——— CTA Email Prefill ——— */
+const APP_LOGIN = 'https://app.revtrue.tech/login';
+
+function setupEmailLink(inputId, linkId) {
+  const input = document.getElementById(inputId);
+  const link = document.getElementById(linkId);
+  if (!input || !link) return;
+  input.addEventListener('input', function() {
+    const email = this.value.trim();
+    link.href = email ? APP_LOGIN + '?email=' + encodeURIComponent(email) : APP_LOGIN;
+  });
 }
+
+setupEmailLink('hero-email', 'hero-cta');
+setupEmailLink('email', 'cta');
 
 /* ——— Demo Engine ——— */
 const STP=[{n:'Upload',d:2600},{n:'Processing',d:2200},{n:'Dashboard',d:2600},{n:'Stage Journey',d:3000},{n:'Cohorts',d:2200},{n:'Time Series',d:2600}];
