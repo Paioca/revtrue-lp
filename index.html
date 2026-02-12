@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TheRevenue — See Exactly Where Your Deals Die → Stage by Stage</title>
+<meta name="description" content="Upload a spreadsheet. In under 60 seconds, see stage-by-stage where deals die, which cohorts convert, and what to fix this quarter.">
+<meta name="keywords" content="pipeline analytics, revenue operations, stage-by-stage conversion, cohort analysis, sales pipeline diagnosis, B2B SaaS, CRM analytics">
+<meta name="author" content="TheRevenue">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:title" content="TheRevenue — See Exactly Where Your Deals Die → Stage by Stage">
+<meta property="og:description" content="Upload a spreadsheet. Before your coffee gets cold, know exactly which stage kills your deals, which cohorts convert, and what to fix this quarter.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://therevenue.com">
+<meta property="og:image" content="https://therevenue.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="TheRevenue">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TheRevenue — Pipeline Analytics That Actually Diagnose">
+<meta name="twitter:description" content="Upload a spreadsheet. In under 60 seconds, see stage-by-stage where deals die.">
+<meta name="twitter:image" content="https://therevenue.com/og-image.png">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://therevenue.com">
+
+<!-- Favicon placeholder -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23E86C3A'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'>R</text></svg>">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"TheRevenue","applicationCategory":"BusinessApplication","operatingSystem":"Web","description":"Pipeline analytics that diagnose where deals die, stage by stage. Upload a CRM export, get your diagnosis in under 60 seconds.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","description":"Free pipeline diagnosis"}}
+</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream:     { DEFAULT:'#FAF8F5', dark:'#F5F2EF', deep:'#EDEAE6' },
+        bdr:       '#E8E4DF',
+        tx:        '#1A1A1A',
+        tx2:       '#6B6560',
+        mt:        '#9B9590',
+        ac:        { DEFAULT:'#E86C3A', hover:'#D4582E', light:'rgba(232,108,58,0.08)' },
+        gn:        { DEFAULT:'#2D9D4E', light:'#4CAF78', bg:'rgba(45,157,78,0.08)' },
+        rd:        '#D94F3D',
+        pk:        '#E8837C',
+      },
+      fontFamily: { sans:['"Plus Jakarta Sans"','system-ui','sans-serif'] },
+    }
+  }
+}
+</script>
+
+<style>
+  /* === Grain overlay === */
+  body::after { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.012;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  /* === Scroll reveal === */
+  .rv { opacity:0; transform:translateY(28px); transition:opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+  .rv.vis { opacity:1; transform:translateY(0); }
+  .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s} .d5{transition-delay:.5s}
+
+  /* === Demo steps === */
+  .demo-step { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px; opacity:0; transition:opacity .4s ease; pointer-events:none; }
+  .demo-step.active { opacity:1; pointer-events:auto; }
+  .funnel-seg { height:100%; transition:width 1s ease; width:0; }
+  .chart-line { fill:none; stroke-width:2; stroke-linecap:round; stroke-dasharray:1000; stroke-dashoffset:1000; transition:stroke-dashoffset 2s ease; }
+  .chart-line.draw { stroke-dashoffset:0; }
+
+  /* === FAQ accordion === */
+  .faq-body { max-height:0; overflow:hidden; transition:max-height .35s ease,padding .35s ease; padding:0 24px; }
+  .faq-item.open .faq-body { max-height:220px; padding:0 24px 20px; }
+  .faq-item.open .faq-chev { transform:rotate(180deg); }
+  .faq-chev { transition:transform .3s ease; }
+
+  /* === Email field focus === */
+  .em-input:focus { outline:none; box-shadow:0 0 0 3px rgba(232,108,58,.15); border-color:#E86C3A; }
+
+  /* === Hover lift === */
+  .hlift { transition:transform .2s ease, box-shadow .2s ease; }
+  .hlift:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,.06); }
+
+  /* === Sticky mobile CTA === */
+  .sticky-mob { transform:translateY(100%); transition:transform .3s ease; }
+  .sticky-mob.show { transform:translateY(0); }
+
+  /* === Dot styles === */
+  .bdot { width:10px; height:10px; border-radius:50%; }
+
+  /* === Smooth scrollbar === */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#E8E4DF; border-radius:3px; }
+</style>
+</head>
+
+<body class="font-sans text-tx antialiased bg-cream overflow-x-hidden leading-relaxed">
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="fixed top-0 inset-x-0 z-50 bg-cream/92 backdrop-blur-xl border-b border-bdr">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="#" class="text-lg font-extrabold tracking-tight select-none">
+      <span class="text-tx">the</span><span class="text-ac">revenue</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-[13px] font-semibold text-tx2">
+      <a href="#benefits" class="hover:text-ac transition-colors">Benefits</a>
+      <a href="#product" class="hover:text-ac transition-colors">Product</a>
+      <a href="#faq" class="hover:text-ac transition-colors">FAQ</a>
+    </nav>
+    <a href="#cta-final" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
+      Get Free Demo →
+    </a>
+  </div>
+</header>
+
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="pt-28 pb-14 md:pt-40 md:pb-24 px-5">
+  <div class="max-w-[720px] mx-auto text-center">
+
+    <div class="rv inline-flex items-center gap-2 border border-bdr rounded-full px-4 py-1.5 text-[11px] font-semibold text-tx2 mb-7 bg-cream">
+      <span class="w-1.5 h-1.5 rounded-full bg-ac inline-block animate-pulse"></span>
+      Built by a Head of Sales, for Heads of Sales
+    </div>
+
+    <h1 class="rv d1 text-[clamp(30px,5.8vw,54px)] font-extrabold leading-[1.06] tracking-[-0.03em] mb-5">
+      See Exactly Where Your<br>Deals Die →
+      <span class="text-ac"> Stage by Stage</span>
+    </h1>
+
+    <p class="rv d2 text-[clamp(15px,1.7vw,18px)] text-tx2 max-w-[520px] mx-auto mb-9 leading-[1.65]">
+      Upload a spreadsheet. Before your coffee gets cold, you'll know exactly which stage kills your deals, which cohorts convert, and what to fix this quarter.
+    </p>
+
+    <!-- Hero Email Capture -->
+    <form id="hero-form" class="rv d3 max-w-md mx-auto" onsubmit="return handleSubmit(event,'hero')">
+      <div class="flex gap-2">
+        <input type="email" id="hero-email" required placeholder="Your work email"
+          class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+        <button type="submit" id="hero-btn"
+          class="bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+          Get Free Diagnosis →
+        </button>
+      </div>
+      <p id="hero-msg" class="text-xs mt-2 min-h-[18px] transition-all"></p>
+    </form>
+
+    <a href="#demo" class="rv d4 inline-flex items-center gap-1.5 text-[13px] text-tx2 hover:text-ac transition-colors font-medium mt-3">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21"/></svg>
+      See the product in under a minute
+    </a>
+
+    <div class="rv d5 mt-10">
+      <p class="text-[10px] font-semibold tracking-[.1em] uppercase text-mt">Trusted by revenue teams running real pipelines</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ PAIN POINTS ═══════════════════ -->
+<section class="py-16 md:py-24 px-5">
+  <div class="max-w-5xl mx-auto">
+    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">Sound familiar?</p>
+    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-12 leading-tight">
+      Every Monday forecast meeting ends the same way
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-5 mb-12">
+      <div class="rv d1 bg-white border border-bdr rounded-2xl p-7 relative overflow-hidden hlift">
+        <div class="absolute top-0 inset-x-0 h-[3px] bg-rd"></div>
+        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-2 tracking-tight">"Why aren't we closing more?"</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed">The VP asks. The room goes quiet. Everyone has theories. Nobody has the exact stage where deals are dying, backed by real conversion data.</p>
+      </div>
+
+      <div class="rv d2 bg-white border border-bdr rounded-2xl p-7 relative overflow-hidden hlift">
+        <div class="absolute top-0 inset-x-0 h-[3px] bg-ac"></div>
+        <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-ac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-2 tracking-tight">Your CRM reports lie to you</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed">HubSpot shows a simple funnel. No cohorts. No real stage-by-stage conversion. No way to compare this January vs last January in two clicks.</p>
+      </div>
+
+      <div class="rv d3 bg-white border border-bdr rounded-2xl p-7 relative overflow-hidden hlift">
+        <div class="absolute top-0 inset-x-0 h-[3px] bg-gn"></div>
+        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-gn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-2 tracking-tight">Friday afternoon, exporting to Excel</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed">You spend hours building a pipeline view in a spreadsheet. By Monday, the numbers are stale and the conclusion is still vague.</p>
+      </div>
+    </div>
+
+    <p class="rv text-center text-[15px] text-tx2 leading-[1.7] max-w-2xl mx-auto">
+      You already have HubSpot. Or Salesforce. Or Pipedrive. But when the VP asks "why aren't we closing more?" — you still end up exporting to Excel on a Friday afternoon, hoping a pivot table will reveal what your CRM reports can't. <strong class="text-ac font-bold">TheRevenue</strong> reads that same export and finds the bottleneck for you.
+    </p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ DEMO ═══════════════════ -->
+<section class="py-16 md:py-24 px-5" id="demo">
+  <div class="max-w-4xl mx-auto">
+    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">See It Work</p>
+    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-2 leading-tight">
+      Upload. Wait under 60 seconds. Read your entire pipeline.
+    </h2>
+    <p class="rv d2 text-center text-[15px] text-tx2 mb-10">Drop a CSV from HubSpot or Salesforce. TheRevenue does the rest.</p>
+
+    <div class="rv d3 bg-white border border-bdr rounded-2xl overflow-hidden shadow-[0_8px_48px_rgba(0,0,0,.06)]" id="demo-browser">
+      <!-- Chrome -->
+      <div class="bg-cream-dark px-4 py-2.5 flex items-center gap-2 border-b border-bdr">
+        <div class="bdot bg-pk"></div><div class="bdot bg-yellow-300"></div><div class="bdot bg-gn-light"></div>
+        <div class="flex-1 bg-white border border-bdr rounded-md px-3 py-1 text-[11px] text-mt ml-2 font-medium">app.therevenue.com</div>
+      </div>
+
+      <!-- Body -->
+      <div class="relative bg-cream" style="min-height:420px" id="demo-body">
+
+        <!-- Step 0: Upload -->
+        <div class="demo-step active" data-step="0">
+          <div id="uz" class="border-2 border-dashed border-bdr rounded-2xl p-10 text-center w-full max-w-sm transition-all duration-300">
+            <div class="text-4xl mb-3 opacity-40">📄</div>
+            <p class="text-sm text-mt">Drag your CRM export here</p>
+            <div id="uf" class="inline-flex items-center gap-2 bg-white border border-bdr rounded-lg px-4 py-2.5 text-sm font-semibold mt-4 opacity-0 translate-y-2 transition-all duration-500">
+              <span class="text-gn">📊</span> hubspot-export-q4.csv
+            </div>
+            <div class="flex gap-2 mt-3 justify-center flex-wrap">
+              <span id="t1" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">4 columns detected</span>
+              <span id="t2" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">1,029 deals found</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: Processing -->
+        <div class="demo-step" data-step="1">
+          <p class="text-base font-bold mb-5">Analyzing your pipeline...</p>
+          <div class="text-left max-w-[280px] space-y-2" id="pl">
+            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Mapping stages</div>
+            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Calculating conversions</div>
+            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Building cohorts</div>
+            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Generating diagnostics</div>
+          </div>
+        </div>
+
+        <!-- Step 2: Dashboard -->
+        <div class="demo-step" data-step="2">
+          <div class="grid grid-cols-3 gap-2.5 w-full max-w-lg" id="kg">
+            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="1029">
+              <div class="kv text-xl font-extrabold tracking-tight tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Total Deals</div>
+            </div>
+            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="91">
+              <div class="kv text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Won</div>
+            </div>
+            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="822">
+              <div class="kv text-xl font-extrabold tracking-tight text-rd tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Lost</div>
+            </div>
+            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="10" data-s="%">
+              <div class="kv text-xl font-extrabold tracking-tight text-ac tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Win Rate</div>
+              <div class="h-1.5 bg-gray-100 rounded-full mt-1.5 overflow-hidden"><div id="wr" class="h-full rounded-full bg-gradient-to-r from-gn-light to-pk w-0 transition-all duration-1000"></div></div>
+            </div>
+            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="795" data-p="$" data-s="k">
+              <div class="kv text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Revenue</div>
+            </div>
+            <div class="kp bg-ac rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="70" data-s=" days">
+              <div class="kv text-xl font-extrabold tracking-tight text-white tabular-nums">0</div>
+              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-white/70 mt-0.5">Median Cycle</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Stage Journey -->
+        <div class="demo-step" data-step="3">
+          <div class="w-full max-w-lg" id="fn">
+            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="52" data-p="38" data-o="10">
+              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Qualification</div>
+              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
+              <div class="text-[13px] font-bold w-12 text-right shrink-0">72.3%</div>
+            </div>
+            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="38" data-p="50" data-o="12">
+              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">SQO</div>
+              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
+              <div class="text-[13px] font-bold w-12 text-right shrink-0">52.5%</div>
+            </div>
+            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="28" data-p="58" data-o="14">
+              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Negotiation</div>
+              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
+              <div class="text-[13px] font-bold w-12 text-right shrink-0 text-rd">35.9%</div>
+            </div>
+            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="36" data-p="48" data-o="16">
+              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Commit</div>
+              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
+              <div class="text-[13px] font-bold w-12 text-right shrink-0">46.9%</div>
+            </div>
+            <div id="fw" class="flex justify-center mt-3 opacity-0 transition-opacity duration-500"><span class="bg-gn text-white text-xs font-bold px-4 py-1.5 rounded-lg">91 WON · $795k</span></div>
+            <div id="fd" class="bg-ac-light border border-ac/15 rounded-xl p-3.5 mt-3 text-xs text-tx2 leading-relaxed opacity-0 transition-opacity duration-500">Biggest drop at <strong class="text-rd font-bold">Negotiation</strong> with only <strong class="text-rd font-bold">35.9%</strong> conversion — main bottleneck identified.</div>
+          </div>
+        </div>
+
+        <!-- Step 4: Cohort -->
+        <div class="demo-step" data-step="4">
+          <div class="w-full max-w-lg overflow-x-auto" id="ct">
+            <table class="w-full text-xs">
+              <thead><tr class="border-b border-bdr"><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-left">Cohort</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2">Total</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-left">Pipeline</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2">Conv%</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-right">Revenue</th></tr></thead>
+              <tbody>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Jan/26</td><td class="py-2 px-2 text-center">27</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:7%"></div><div class="bg-pk h-full" style="width:15%"></div><div class="bg-gray-200 h-full" style="width:78%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">33.3%</td><td class="py-2 px-2 text-right">$9k</td></tr>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Dec/25</td><td class="py-2 px-2 text-center">15</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:0%"></div><div class="bg-pk h-full" style="width:60%"></div><div class="bg-gray-200 h-full" style="width:40%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">0%</td><td class="py-2 px-2 text-right">$0</td></tr>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Nov/25</td><td class="py-2 px-2 text-center">21</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:27%"></div><div class="bg-pk h-full" style="width:50%"></div><div class="bg-gray-200 h-full" style="width:23%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">27.3%</td><td class="py-2 px-2 text-right">$46k</td></tr>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Oct/25</td><td class="py-2 px-2 text-center">20</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:0%"></div><div class="bg-pk h-full" style="width:85%"></div><div class="bg-gray-200 h-full" style="width:15%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">0%</td><td class="py-2 px-2 text-right">$0</td></tr>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Sep/25</td><td class="py-2 px-2 text-center">33</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:17%"></div><div class="bg-pk h-full" style="width:65%"></div><div class="bg-gray-200 h-full" style="width:18%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">16.7%</td><td class="py-2 px-2 text-right">$52k</td></tr>
+                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Aug/25</td><td class="py-2 px-2 text-center">31</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:7%"></div><div class="bg-pk h-full" style="width:80%"></div><div class="bg-gray-200 h-full" style="width:13%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">7.4%</td><td class="py-2 px-2 text-right">$18k</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 5: Time Series -->
+        <div class="demo-step" data-step="5">
+          <div class="w-full max-w-lg">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-bold">Deals per month</span>
+              <div class="flex gap-1"><span class="text-[10px] font-semibold px-2.5 py-1 rounded-md bg-white border border-bdr text-tx2">Monthly</span><span class="text-[10px] font-semibold px-2.5 py-1 rounded-md bg-ac text-white">Cumulative</span></div>
+            </div>
+            <svg class="w-full" viewBox="0 0 520 200">
+              <line x1="40" y1="10" x2="40" y2="180" stroke="#E8E4DF"/><line x1="40" y1="180" x2="510" y2="180" stroke="#E8E4DF"/>
+              <line x1="40" y1="140" x2="510" y2="140" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
+              <line x1="40" y1="100" x2="510" y2="100" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
+              <line x1="40" y1="60" x2="510" y2="60" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
+              <text x="70" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
+              <text x="150" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Apr</text>
+              <text x="250" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jul</text>
+              <text x="350" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Oct</text>
+              <text x="450" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
+              <path class="chart-line" d="M70,95 L110,105 L150,120 L190,90 L230,80 L270,75 L310,70 L350,85 L390,95 L430,100 L470,110 L490,130" stroke="#94A3B8"/>
+              <path class="chart-line" d="M70,110 L110,115 L150,130 L190,100 L230,95 L270,88 L310,82 L350,98 L390,105 L430,115 L470,125 L490,140" stroke="#E8837C"/>
+              <path class="chart-line" d="M70,165 L110,160 L150,155 L190,162 L230,158 L270,155 L310,160 L350,150 L390,145 L430,155 L470,160 L490,165" stroke="#4CAF78"/>
+              <path class="chart-line" d="M70,150 L110,145 L150,140 L190,148 L230,142 L270,138 L310,144 L350,130 L390,125 L430,140 L470,148 L490,155" stroke="#E86C3A" stroke-dasharray="6,4"/>
+            </svg>
+            <div class="flex gap-4 justify-center mt-3 flex-wrap">
+              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-gray-400"></div>New</div>
+              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-pk"></div>Lost</div>
+              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-gn-light"></div>Won</div>
+              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-ac"></div>Conv %</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="flex items-center justify-center gap-4 py-3 border-t border-bdr bg-white">
+        <button id="dr" class="text-[11px] font-semibold text-tx2 border border-bdr rounded-md px-3 py-1 hover:border-ac hover:text-ac transition-colors">↻ Replay</button>
+        <div class="flex gap-1.5 items-center" id="dd"></div>
+        <span class="text-[10px] font-semibold tracking-[.04em] uppercase text-mt w-20" id="dl">Upload</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ BENEFITS ═══════════════════ -->
+<section class="py-16 md:py-24 px-5" id="benefits">
+  <div class="max-w-5xl mx-auto">
+    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">Why TheRevenue</p>
+    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-12 leading-tight">
+      Five reports. One upload. Zero setup.
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <!-- B1 -->
+      <div class="rv d1 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center mb-4">
+          <svg class="w-[18px] h-[18px] text-ac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Know exactly where deals stall</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Stage Journey analysis shows conversion at every stage. You'll see the bottleneck in seconds — not after hours in Excel.</p>
+        <div class="bg-cream border border-bdr rounded-xl p-3 space-y-1">
+          <div class="h-2.5 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:52%"></div><div class="bg-pk" style="width:38%"></div><div class="bg-gray-200" style="width:10%"></div></div>
+          <div class="h-2.5 rounded-sm flex overflow-hidden w-3/4"><div class="bg-gn-light" style="width:38%"></div><div class="bg-pk" style="width:50%"></div><div class="bg-gray-200" style="width:12%"></div></div>
+          <div class="h-2.5 rounded-sm flex overflow-hidden w-1/2"><div class="bg-gn-light" style="width:28%"></div><div class="bg-pk" style="width:58%"></div><div class="bg-gray-200" style="width:14%"></div></div>
+          <div class="h-2.5 rounded-sm flex overflow-hidden w-1/3"><div class="bg-gn-light" style="width:36%"></div><div class="bg-pk" style="width:48%"></div><div class="bg-gray-200" style="width:16%"></div></div>
+        </div>
+      </div>
+
+      <!-- B2 -->
+      <div class="rv d2 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-4">
+          <svg class="w-[18px] h-[18px] text-gn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Compare any cohort to any cohort</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Is this January better than last? Which segment converts best? One click. Real answer.</p>
+        <div class="bg-cream border border-bdr rounded-xl p-3 space-y-1.5">
+          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/26</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:7%"></div><div class="bg-pk" style="width:15%"></div><div class="bg-gray-200" style="width:78%"></div></div></div>
+          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/25</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:10%"></div><div class="bg-pk" style="width:85%"></div><div class="bg-gray-200" style="width:5%"></div></div></div>
+          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/24</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:13%"></div><div class="bg-pk" style="width:82%"></div><div class="bg-gray-200" style="width:5%"></div></div></div>
+        </div>
+      </div>
+
+      <!-- B3 -->
+      <div class="rv d3 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-4">
+          <svg class="w-[18px] h-[18px] text-gn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Read your entire operation in 1 minute</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Total deals, win rate, median ticket, cycle time, revenue trend — all in one screen. A diagnosis to read, not a dashboard to build.</p>
+        <div class="bg-cream border border-bdr rounded-xl p-3"><div class="grid grid-cols-3 gap-1.5">
+          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight">1,029</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Deals</div></div>
+          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight text-ac">10%</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Win Rate</div></div>
+          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight text-gn">$795k</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Revenue</div></div>
+        </div></div>
+      </div>
+
+      <!-- B4 -->
+      <div class="rv d4 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center mb-4">
+          <svg class="w-[18px] h-[18px] text-ac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Upload a spreadsheet. That's it.</h3>
+        <p class="text-[13px] text-tx2 leading-relaxed mb-4">No OAuth. No CRM integration. No onboarding call. Export from HubSpot or Salesforce, drop the CSV, and your reports are ready.</p>
+        <div class="bg-cream border border-bdr rounded-xl p-3">
+          <div class="flex items-center justify-center gap-3 py-2 text-sm font-semibold text-tx2">📄 CSV <span class="text-lg text-ac">→</span> 📊 5 reports</div>
+          <div class="text-center text-[9px] font-bold text-ac mt-1">CSV to insights in under 60 seconds</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ SCREENSHOTS ═══════════════════ -->
+<section class="py-16 md:py-24 px-5 bg-white border-y border-bdr" id="product">
+  <div class="max-w-5xl mx-auto">
+    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">Product</p>
+    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-3 leading-tight">Five reports generated automatically</h2>
+    <p class="rv d2 text-center text-[15px] text-tx2 mb-12 max-w-lg mx-auto">From a single CSV upload, TheRevenue generates the five views your CRM can't — ready to read, not to build.</p>
+
+    <div class="rv d3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
+        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
+          <div class="text-center p-6"><div class="text-3xl mb-3">📊</div><div class="text-xs font-bold text-tx mb-1">Dashboard Resumo</div><div class="text-[10px] text-mt">KPIs, win rate, revenue, cycle time</div></div>
+          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
+        </div>
+      </div>
+      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
+        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
+          <div class="text-center p-6"><div class="text-3xl mb-3">🔍</div><div class="text-xs font-bold text-tx mb-1">Stage Journey</div><div class="text-[10px] text-mt">Funnel + bottleneck diagnosis</div></div>
+          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
+        </div>
+      </div>
+      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
+        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
+          <div class="text-center p-6"><div class="text-3xl mb-3">📈</div><div class="text-xs font-bold text-tx mb-1">Cohort & Time Series</div><div class="text-[10px] text-mt">Compare periods, track trends</div></div>
+          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="rv text-center text-[11px] text-mt mt-6 italic">Replace placeholders with real product screenshots</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ TESTIMONIALS ═══════════════════ -->
+<section class="py-16 md:py-24 px-5">
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Metric -->
+    <div class="rv bg-gradient-to-br from-ac to-ac-hover rounded-3xl p-12 md:p-16 text-center text-white mb-10 relative overflow-hidden">
+      <div class="absolute inset-0 opacity-[.04]" style="background-image:url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"></div>
+      <div class="relative">
+        <div class="text-[clamp(52px,10vw,84px)] font-extrabold tracking-tighter leading-none">&lt;60s</div>
+        <p class="text-[15px] opacity-90 max-w-md mx-auto mt-3 leading-relaxed">from CRM export to full pipeline diagnosis. What used to take a Friday afternoon in Excel now takes under a minute.</p>
+      </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rv d1 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="text-sm mb-3 tracking-wider text-amber-400">★★★★★</div>
+        <p class="text-[14px] text-tx leading-[1.65] italic mb-5">"We found a 22% drop-off between SQO and Negotiation that we'd been blind to for two quarters. TheRevenue showed it in our first upload."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-ac-light flex items-center justify-center text-xs font-bold text-ac">JR</div>
+          <div><div class="text-sm font-bold">James R.</div><div class="text-[11px] text-mt">VP Revenue Ops · SaaS, Series C</div></div>
+        </div>
+      </div>
+      <div class="rv d2 bg-white border border-bdr rounded-2xl p-7 hlift">
+        <div class="text-sm mb-3 tracking-wider text-amber-400">★★★★★</div>
+        <p class="text-[14px] text-tx leading-[1.65] italic mb-5">"I used to spend Friday afternoons building pipeline decks. Now I open TheRevenue before my Monday forecast call and I'm done in 10 minutes."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-ac-light flex items-center justify-center text-xs font-bold text-ac">MK</div>
+          <div><div class="text-sm font-bold">Maria K.</div><div class="text-[11px] text-mt">CRO · B2B Marketplace</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ FAQ ═══════════════════ -->
+<section class="py-16 md:py-24 px-5 bg-white border-y border-bdr" id="faq">
+  <div class="max-w-2xl mx-auto">
+    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">FAQ</p>
+    <h2 class="rv d1 text-[clamp(22px,3.5vw,34px)] font-extrabold tracking-tight text-center mb-10 leading-tight">Common questions</h2>
+
+    <div class="rv d2 space-y-3" id="faq-list">
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">What data do I need to upload?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">A simple CSV with 4 columns: deal name, creation date, current stage, and close date. That's what any CRM (HubSpot, Salesforce, Pipedrive) exports in two clicks. No sensitive data needed — just pipeline stages and dates.</div>
+      </div>
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">Do I need to connect my CRM via OAuth or API?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">No. Zero integration. You export a spreadsheet from your CRM and upload it. No OAuth, no API keys, no IT team involvement, no multi-day setup. It takes under 60 seconds from export to diagnosis.</div>
+      </div>
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">What reports does TheRevenue generate?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">Five reports: Dashboard Summary (KPIs), Stage Journey (funnel with bottleneck diagnosis), Cohort Analysis (compare periods side-by-side), Time Series (trends over time), and Segmentation (break down by any field). All generated automatically from one upload.</div>
+      </div>
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">How is this different from my CRM's built-in reports?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">CRM reports show a simple funnel. TheRevenue shows real stage-by-stage conversion per cohort, compares periods with one click, calculates median cycle time per stage, and identifies your biggest bottleneck automatically. It delivers a diagnosis, not a dashboard you still need to interpret.</div>
+      </div>
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">Is my data secure?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">Yes. Your data is processed securely and never shared. We only need pipeline metadata (stages and dates) — not customer names, emails, or deal values if you prefer not to include them. You control exactly what you upload.</div>
+      </div>
+      <div class="faq-item border border-bdr rounded-xl bg-cream overflow-hidden">
+        <button class="w-full flex items-center justify-between px-6 py-4 text-left" onclick="togFaq(this)">
+          <span class="text-[14px] font-bold pr-4">Is it free?</span>
+          <svg class="faq-chev w-4 h-4 text-mt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-body text-[13px] text-tx2 leading-relaxed">Free to start. Your first pipeline diagnosis is completely free — no credit card, no commitment. Upload your data, get your reports, and decide if it's worth it based on the insights you see.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ FINAL CTA ═══════════════════ -->
+<section class="py-20 md:py-28 px-5" id="cta-final">
+  <div class="max-w-xl mx-auto text-center">
+    <h2 class="rv text-[clamp(24px,4.5vw,42px)] font-extrabold tracking-tight leading-[1.1] mb-4">
+      Stop Exporting to Excel.<br>Start Knowing in Under a Minute.
+    </h2>
+    <p class="rv d1 text-[15px] text-tx2 mb-8">Upload your CRM data. Get the diagnosis your Monday meeting needs.</p>
+
+    <form id="cta-form" class="rv d2 max-w-md mx-auto mb-6" onsubmit="return handleSubmit(event,'cta')">
+      <div class="flex gap-2">
+        <input type="email" id="cta-email" required placeholder="Your work email"
+          class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+        <button type="submit" id="cta-btn"
+          class="bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+          Get Free Diagnosis →
+        </button>
+      </div>
+      <p id="cta-msg" class="text-xs mt-2 min-h-[18px]"></p>
+    </form>
+
+    <div class="rv d3 flex flex-wrap items-center justify-center gap-5">
+      <span class="flex items-center gap-1.5 text-xs font-semibold text-gn"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Free to start</span>
+      <span class="flex items-center gap-1.5 text-xs font-semibold text-gn"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>No CRM integration needed</span>
+      <span class="flex items-center gap-1.5 text-xs font-semibold text-gn"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>First report in under 60 seconds</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="border-t border-bdr py-10 px-5">
+  <div class="max-w-5xl mx-auto text-center">
+    <a href="#" class="text-lg font-extrabold tracking-tight inline-block"><span class="text-tx">the</span><span class="text-ac">revenue</span></a>
+    <div class="flex justify-center gap-6 mt-4">
+      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Privacy Policy</a>
+      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Terms</a>
+      <a href="mailto:hello@therevenue.com" class="text-xs text-mt hover:text-ac transition-colors">Contact</a>
+    </div>
+    <p class="text-[11px] text-mt mt-3">© 2025 TheRevenue. All rights reserved.</p>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
+<div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
+  <a href="#cta-final" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
+</div>
+
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ——— Scroll Reveal ——— */
+const ro = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('vis');ro.unobserve(e.target)} }), {threshold:.1});
+document.querySelectorAll('.rv').forEach(el => ro.observe(el));
+
+/* ——— Sticky Mobile ——— */
+const smEl = document.getElementById('sm');
+new IntersectionObserver(([e]) => smEl.classList.toggle('show',!e.isIntersecting),{threshold:0}).observe(document.querySelector('section'));
+
+/* ——— FAQ ——— */
+function togFaq(btn){const i=btn.closest('.faq-item'),o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open')}
+
+/* ——— Email Validation ——— */
+function handleSubmit(e,id){
+  e.preventDefault();
+  const inp=document.getElementById(id+'-email'), msg=document.getElementById(id+'-msg'), btn=document.getElementById(id+'-btn');
+  const v=inp.value.trim();
+  msg.textContent=''; msg.className='text-xs mt-2 min-h-[18px]';
+  // format
+  if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){
+    msg.textContent='Please enter a valid email address.';
+    msg.classList.add('text-rd','font-medium');
+    inp.style.borderColor='#D94F3D';
+    setTimeout(()=>inp.style.borderColor='',2000);
+    return false;
+  }
+  // block personal
+  const bl=['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'];
+  const dom=v.split('@')[1]?.toLowerCase();
+  if(bl.includes(dom)){
+    msg.textContent='Please use your work email for access.';
+    msg.classList.add('text-ac','font-medium');
+    return false;
+  }
+  // success
+  msg.innerHTML='<span class="text-gn font-semibold">✓ We\'ll send your access link shortly!</span>';
+  inp.value=''; inp.disabled=true;
+  btn.textContent='Sent ✓'; btn.disabled=true; btn.classList.add('opacity-60','cursor-default');
+  return false;
+}
+
+/* ——— Demo Engine ——— */
+const STP=[{n:'Upload',d:2600},{n:'Processing',d:2200},{n:'Dashboard',d:2600},{n:'Stage Journey',d:3000},{n:'Cohorts',d:2200},{n:'Time Series',d:2600}];
+let cs=0,dt=null,ds=false;
+const dl=document.getElementById('dl'),dd=document.getElementById('dd');
+
+STP.forEach((_,i)=>{const d=document.createElement('div');d.className='h-2 rounded-full cursor-pointer transition-all duration-200 '+(i===0?'w-6 bg-ac':'w-2 bg-bdr');d.onclick=()=>go(i);dd.appendChild(d)});
+
+function go(i){
+  clearTimeout(dt); cs=i;
+  document.querySelectorAll('.demo-step').forEach(s=>s.classList.remove('active'));
+  [...dd.children].forEach((d,x)=>{d.className='h-2 rounded-full cursor-pointer transition-all duration-200 '+(x===i?'w-6 bg-ac':'w-2 bg-bdr')});
+  document.querySelector(`.demo-step[data-step="${i}"]`).classList.add('active');
+  dl.textContent=STP[i].n;
+  anim(i);
+  if(i<STP.length-1) dt=setTimeout(()=>go(i+1),STP[i].d);
+}
+
+function anim(i){
+  if(i===0){
+    const z=document.getElementById('uz'),f=document.getElementById('uf'),a=document.getElementById('t1'),b=document.getElementById('t2');
+    z.style.borderColor='';z.style.background='';f.style.opacity='0';f.style.transform='translateY(8px)';a.style.opacity='0';b.style.opacity='0';
+    setTimeout(()=>{z.style.borderColor='#E86C3A';z.style.background='rgba(232,108,58,.03)'},300);
+    setTimeout(()=>{f.style.opacity='1';f.style.transform='translateY(0)'},800);
+    setTimeout(()=>a.style.opacity='1',1400);
+    setTimeout(()=>b.style.opacity='1',1700);
+  }
+  if(i===1){
+    const ps=document.querySelectorAll('#pl .pi');
+    ps.forEach(p=>{p.style.opacity='0';p.style.transform='translateX(-8px)';p.style.color=''});
+    ps.forEach((p,x)=>setTimeout(()=>{p.style.opacity='1';p.style.transform='translateX(0)';p.style.color='#1A1A1A'},400+x*400));
+  }
+  if(i===2){
+    const ks=document.querySelectorAll('#kg .kp');
+    ks.forEach(k=>{k.style.opacity='0';k.style.transform='scale(.9)'});
+    ks.forEach((k,x)=>setTimeout(()=>{
+      k.style.opacity='1';k.style.transform='scale(1)';
+      const v=+k.dataset.v,s=k.dataset.s||'',p=k.dataset.p||'';
+      cntUp(k.querySelector('.kv'),v,p,s,800);
+    },x*180));
+    setTimeout(()=>{const w=document.getElementById('wr');if(w)w.style.width='100%'},500);
+  }
+  if(i===3){
+    const rs=document.querySelectorAll('#fn .fr'),fw=document.getElementById('fw'),fd=document.getElementById('fd');
+    rs.forEach(r=>{r.style.opacity='0';r.style.transform='translateX(-16px)';r.querySelectorAll('.funnel-seg').forEach(s=>s.style.width='0')});
+    fw.style.opacity='0';fd.style.opacity='0';
+    rs.forEach((r,x)=>setTimeout(()=>{
+      r.style.opacity='1';r.style.transform='translateX(0)';
+      const ss=r.querySelectorAll('.funnel-seg');
+      ss[0].style.width=r.dataset.g+'%';ss[1].style.width=r.dataset.p+'%';ss[2].style.width=r.dataset.o+'%';
+    },x*350));
+    setTimeout(()=>fw.style.opacity='1',rs.length*350+200);
+    setTimeout(()=>fd.style.opacity='1',rs.length*350+600);
+  }
+  if(i===4){
+    const rs=document.querySelectorAll('.cr');
+    rs.forEach(r=>{r.style.opacity='0';r.style.transform='translateY(4px)'});
+    rs.forEach((r,x)=>setTimeout(()=>{r.style.opacity='1';r.style.transform='translateY(0)'},x*150));
+  }
+  if(i===5){
+    const ls=document.querySelectorAll('.chart-line');
+    ls.forEach(l=>{l.classList.remove('draw');l.style.strokeDashoffset='1000'});
+    setTimeout(()=>ls.forEach((l,x)=>setTimeout(()=>l.classList.add('draw'),x*200)),200);
+  }
+}
+
+function cntUp(el,t,p,s,dur){
+  const st=performance.now();
+  (function tick(now){
+    const pr=Math.min((now-st)/dur,1);
+    el.textContent=p+Math.round(t*pr).toLocaleString()+s;
+    if(pr<1)requestAnimationFrame(tick);
+  })(st);
+}
+
+/* Auto-start */
+const db=document.getElementById('demo-browser');
+new IntersectionObserver(([e])=>{if(e.isIntersecting&&!ds){ds=true;setTimeout(()=>go(0),300)}},{threshold:.25}).observe(db);
+document.getElementById('dr').onclick=()=>{ds=true;go(0)};
+</script>
+</body>
+</html>
