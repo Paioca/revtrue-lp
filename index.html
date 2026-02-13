@@ -2,7 +2,10 @@
 <html lang="en" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>TheRevenue — See Exactly Where Your Deals Die → Stage by Stage</title>
 <meta name="description" content="Upload a spreadsheet. In under 60 seconds, see stage-by-stage where deals die, which cohorts convert, and what to fix this quarter.">
 <meta name="keywords" content="pipeline analytics, revenue operations, stage-by-stage conversion, cohort analysis, sales pipeline diagnosis, B2B SaaS, CRM analytics">
@@ -370,7 +373,7 @@ tailwind.config = {
 
       <!-- Nav -->
       <div class="flex items-center justify-center gap-4 py-3 border-t border-bdr bg-white">
-        <button id="dr" class="text-[11px] font-semibold text-tx2 border border-bdr rounded-md px-3 py-1 hover:border-ac hover:text-ac transition-colors">↻ Replay</button>
+        <button id="dr" class="text-[12px] font-semibold text-tx2 border border-bdr rounded-md px-4 py-2 hover:border-ac hover:text-ac transition-colors min-h-[44px]">↻ Replay</button>
         <div class="flex gap-1.5 items-center" id="dd"></div>
         <span class="text-[10px] font-semibold tracking-[.04em] uppercase text-mt w-20" id="dl">Upload</span>
       </div>
@@ -600,13 +603,13 @@ tailwind.config = {
 
 
 <!-- ═══════════════════ FOOTER ═══════════════════ -->
-<footer class="border-t border-bdr py-10 px-5">
+<footer class="border-t border-bdr py-10 px-5" style="padding-bottom:calc(2.5rem + env(safe-area-inset-bottom))">
   <div class="max-w-5xl mx-auto text-center">
     <a href="#" class="text-lg font-extrabold tracking-tight inline-block"><span class="text-tx">the</span><span class="text-ac">revenue</span></a>
     <div class="flex justify-center gap-6 mt-4">
-      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Privacy Policy</a>
-      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Terms</a>
-      <a href="mailto:hello@therevenue.com" class="text-xs text-mt hover:text-ac transition-colors">Contact</a>
+      <a href="#" class="text-sm text-mt hover:text-ac transition-colors py-1">Privacy Policy</a>
+      <a href="#" class="text-sm text-mt hover:text-ac transition-colors py-1">Terms</a>
+      <a href="mailto:hello@therevenue.com" class="text-sm text-mt hover:text-ac transition-colors py-1">Contact</a>
     </div>
     <p class="text-[11px] text-mt mt-3">© 2025 TheRevenue. All rights reserved.</p>
   </div>
@@ -614,7 +617,7 @@ tailwind.config = {
 
 
 <!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
-<div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
+<div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm" style="padding-bottom:calc(0.75rem + env(safe-area-inset-bottom))">
   <a href="https://app.revtrue.tech/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
 </div>
 
