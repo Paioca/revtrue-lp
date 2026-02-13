@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -69,6 +69,9 @@ tailwind.config = {
 </script>
 
 <style>
+  /* === Prevent iOS overflow === */
+  html, body { max-width: 100%; overflow-x: hidden; }
+
   /* === Grain overlay === */
   body::after { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.012;
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -152,11 +155,11 @@ tailwind.config = {
 
     <!-- Hero Email Capture -->
     <div class="rv d3 max-w-md mx-auto">
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row">
         <input type="email" id="hero-email" aria-label="Seu email" placeholder="Your work email"
-          class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+          class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-base font-medium placeholder:text-mt transition-all">
         <a id="hero-cta" href="https://app.revtrue.tech/login"
-          class="inline-flex items-center bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+          class="inline-flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
         </a>
       </div>
@@ -583,11 +586,11 @@ tailwind.config = {
     <p class="rv d1 text-[15px] text-tx2 mb-8">Upload your CRM data. Get the diagnosis your Monday meeting needs.</p>
 
     <div id="cta-form" class="rv d2 max-w-md mx-auto mb-6">
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row">
         <input type="email" id="email" aria-label="Seu email" placeholder="Your work email"
-          class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+          class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-base font-medium placeholder:text-mt transition-all">
         <a id="cta" href="https://app.revtrue.tech/login"
-          class="inline-flex items-center bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+          class="inline-flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
         </a>
       </div>
