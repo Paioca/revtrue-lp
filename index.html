@@ -13,8 +13,8 @@
 <meta property="og:title" content="Revtrue — See Exactly Where Your Deals Die → Stage by Stage">
 <meta property="og:description" content="Upload a spreadsheet. Before your coffee gets cold, know exactly which stage kills your deals, which cohorts convert, and what to fix this quarter.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://revtrue.com">
-<meta property="og:image" content="https://revtrue.com/og-image.png">
+<meta property="og:url" content="https://revtrue.tech">
+<meta property="og:image" content="https://revtrue.tech/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Revtrue">
@@ -24,10 +24,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Revtrue — Pipeline Analytics That Actually Diagnose">
 <meta name="twitter:description" content="Upload a spreadsheet. In under 60 seconds, see stage-by-stage where deals die.">
-<meta name="twitter:image" content="https://revtrue.com/og-image.png">
+<meta name="twitter:image" content="https://revtrue.tech/og-image.png">
 
 <!-- Canonical -->
-<link rel="canonical" href="https://revtrue.com">
+<link rel="canonical" href="https://revtrue.tech">
 
 <!-- Favicon placeholder -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23E86C3A'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'>R</text></svg>">
@@ -133,7 +133,7 @@ tailwind.config = {
       <a href="#demo" class="hover:text-ac transition-colors">How It Works</a>
       <a href="#faq" class="hover:text-ac transition-colors">FAQ</a>
     </nav>
-    <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.com')+'/login';return false" href="https://app.revtrue.com/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm cursor-pointer">
+    <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.tech')+'/login';return false" href="https://app.revtrue.tech/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm cursor-pointer">
       Get Free Demo →
     </a>
   </div>
@@ -236,7 +236,7 @@ tailwind.config = {
       <!-- Chrome -->
       <div class="bg-cream-dark px-4 py-2.5 flex items-center gap-2 border-b border-bdr">
         <div class="bdot bg-pk"></div><div class="bdot bg-yellow-300"></div><div class="bdot bg-gn-light"></div>
-        <div class="flex-1 bg-white border border-bdr rounded-md px-3 py-1 text-[11px] text-mt ml-2 font-medium">app.revtrue.com</div>
+        <div class="flex-1 bg-white border border-bdr rounded-md px-3 py-1 text-[11px] text-mt ml-2 font-medium">app.revtrue.tech</div>
       </div>
 
       <!-- Body -->
@@ -746,7 +746,7 @@ tailwind.config = {
 
 <!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
 <div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
-  <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.com')+'/login';return false" href="https://app.revtrue.com/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
+  <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.tech')+'/login';return false" href="https://app.revtrue.tech/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
 </div>
 
 
@@ -765,7 +765,7 @@ new IntersectionObserver(([e]) => smEl.classList.toggle('show',!e.isIntersecting
 function togFaq(btn){const i=btn.closest('.faq-item'),o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open')}
 
 /* ——— Email Capture → Redirect to App Login ——— */
-var APP_LOGIN=window.location.hostname==='localhost'?'http://localhost:3000/login':'https://app.revtrue.com/login';
+var APP_LOGIN=window.location.hostname==='localhost'?'http://localhost:3000/login':'https://app.revtrue.tech/login';
 function handleSubmit(e,id){
   e.preventDefault();
   var inp=document.getElementById(id+'-email'), msg=document.getElementById(id+'-msg');
