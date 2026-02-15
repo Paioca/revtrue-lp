@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth overflow-x-hidden">
+<html lang="en" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#FAF8F5">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TheRevenue — See Exactly Where Your Deals Die → Stage by Stage</title>
 <meta name="description" content="Upload a spreadsheet. In under 60 seconds, see stage-by-stage where deals die, which cohorts convert, and what to fix this quarter.">
 <meta name="keywords" content="pipeline analytics, revenue operations, stage-by-stage conversion, cohort analysis, sales pipeline diagnosis, B2B SaaS, CRM analytics">
@@ -69,9 +66,6 @@ tailwind.config = {
 </script>
 
 <style>
-  /* === Prevent iOS overflow === */
-  html, body { max-width: 100%; overflow-x: hidden; }
-
   /* === Grain overlay === */
   body::after { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.012;
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -82,11 +76,22 @@ tailwind.config = {
   .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s} .d5{transition-delay:.5s}
 
   /* === Demo steps === */
-  .demo-step { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px; opacity:0; transition:opacity .4s ease; pointer-events:none; }
+  .demo-step { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; opacity:0; transition:opacity .4s ease; pointer-events:none; }
   .demo-step.active { opacity:1; pointer-events:auto; }
+  .demo-step.step-top { justify-content:flex-start; padding-top:52px; }
+  @media(min-width:768px){ .demo-step.step-top { padding-top:56px; } }
   .funnel-seg { height:100%; transition:width 1s ease; width:0; }
+  .funnel-bar { height:28px; border-radius:4px; overflow:hidden; display:flex; background:#EDEAE6; }
   .chart-line { fill:none; stroke-width:2; stroke-linecap:round; stroke-dasharray:1000; stroke-dashoffset:1000; transition:stroke-dashoffset 2s ease; }
   .chart-line.draw { stroke-dashoffset:0; }
+  .dtab { color:#9B9590; cursor:default; }
+  .dtab.dtab-on { background:#E86C3A; color:#fff; border-radius:6px; }
+  .kp-anim { opacity:0; transform:scale(.92); transition:all .5s cubic-bezier(.22,1,.36,1); }
+  .kp-anim.vis2 { opacity:1; transform:scale(1); }
+  .fn-row { opacity:0; transform:translateX(-20px); transition:all .6s cubic-bezier(.22,1,.36,1); }
+  .fn-row.vis2 { opacity:1; transform:translateX(0); }
+  .co-row { opacity:0; transform:translateY(6px); transition:all .4s ease; }
+  .co-row.vis2 { opacity:1; transform:translateY(0); }
 
   /* === FAQ accordion === */
   .faq-body { max-height:0; overflow:hidden; transition:max-height .35s ease,padding .35s ease; padding:0 24px; }
@@ -112,6 +117,7 @@ tailwind.config = {
   ::-webkit-scrollbar { width:6px; }
   ::-webkit-scrollbar-track { background:transparent; }
   ::-webkit-scrollbar-thumb { background:#E8E4DF; border-radius:3px; }
+
 </style>
 </head>
 
@@ -124,11 +130,10 @@ tailwind.config = {
       <span class="text-tx">the</span><span class="text-ac">revenue</span>
     </a>
     <nav class="hidden md:flex items-center gap-7 text-[13px] font-semibold text-tx2">
-      <a href="#benefits" class="hover:text-ac transition-colors">Benefits</a>
-      <a href="#product" class="hover:text-ac transition-colors">Product</a>
+      <a href="#demo" class="hover:text-ac transition-colors">How It Works</a>
       <a href="#faq" class="hover:text-ac transition-colors">FAQ</a>
     </nav>
-    <a href="https://app.revtrue.tech/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
+    <a href="#cta-final" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
       Get Free Demo →
     </a>
   </div>
@@ -154,16 +159,17 @@ tailwind.config = {
     </p>
 
     <!-- Hero Email Capture -->
-    <div class="rv d3 max-w-md mx-auto">
-      <div class="flex flex-col gap-2 sm:flex-row">
-        <input type="email" id="hero-email" aria-label="Seu email" placeholder="Your work email"
-          class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-base font-medium placeholder:text-mt transition-all">
-        <a id="hero-cta" href="https://app.revtrue.tech/login"
-          class="inline-flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+    <form id="hero-form" class="rv d3 max-w-md mx-auto" onsubmit="return handleSubmit(event,'hero')">
+      <div class="flex gap-2">
+        <input type="email" id="hero-email" required placeholder="Your work email"
+          class="em-input flex-1 px-4 py-3 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+        <button type="submit" id="hero-btn"
+          class="bg-ac hover:bg-ac-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
-        </a>
+        </button>
       </div>
-    </div>
+      <p id="hero-msg" class="text-xs mt-2 min-h-[18px] transition-all"></p>
+    </form>
 
     <a href="#demo" class="rv d4 inline-flex items-center gap-1.5 text-[13px] text-tx2 hover:text-ac transition-colors font-medium mt-3">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21"/></svg>
@@ -213,10 +219,6 @@ tailwind.config = {
         <p class="text-[13px] text-tx2 leading-relaxed">You spend hours building a pipeline view in a spreadsheet. By Monday, the numbers are stale and the conclusion is still vague.</p>
       </div>
     </div>
-
-    <p class="rv text-center text-[15px] text-tx2 leading-[1.7] max-w-2xl mx-auto">
-      You already have HubSpot. Or Salesforce. Or Pipedrive. But when the VP asks "why aren't we closing more?" — you still end up exporting to Excel on a Friday afternoon, hoping a pivot table will reveal what your CRM reports can't. <strong class="text-ac font-bold">TheRevenue</strong> reads that same export and finds the bottleneck for you.
-    </p>
   </div>
 </section>
 
@@ -238,251 +240,373 @@ tailwind.config = {
       </div>
 
       <!-- Body -->
-      <div class="relative bg-cream" style="min-height:420px" id="demo-body">
+      <div class="relative bg-cream" id="demo-body" style="min-height:480px">
 
-        <!-- Step 0: Upload -->
+        <!-- Product tab bar (appears from step 2+) -->
+        <div id="dtabs" class="absolute top-0 inset-x-0 z-10 px-3 md:px-5 pt-2.5 pb-2 flex items-center gap-0.5 md:gap-1 border-b border-bdr bg-cream overflow-x-auto opacity-0 transition-opacity duration-300" style="display:none">
+          <span class="dtab text-[9px] md:text-[10px] font-semibold px-2 md:px-3 py-1.5 whitespace-nowrap" data-t="summary">Summary</span>
+          <span class="dtab text-[9px] md:text-[10px] font-semibold px-2 md:px-3 py-1.5 whitespace-nowrap" data-t="cohort">Cohort</span>
+          <span class="dtab text-[9px] md:text-[10px] font-semibold px-2 md:px-3 py-1.5 whitespace-nowrap" data-t="segmentation">Segmentation</span>
+          <span class="dtab text-[9px] md:text-[10px] font-semibold px-2 md:px-3 py-1.5 whitespace-nowrap" data-t="timeseries">Time Series</span>
+          <span class="dtab text-[9px] md:text-[10px] font-semibold px-2 md:px-3 py-1.5 whitespace-nowrap" data-t="stagejourney">Stage Journey <span class="text-ac">✦</span></span>
+        </div>
+
+        <!-- ─── Step 0: Upload ─── -->
         <div class="demo-step active" data-step="0">
-          <div id="uz" class="border-2 border-dashed border-bdr rounded-2xl p-10 text-center w-full max-w-sm transition-all duration-300">
+          <div id="uz" class="border-2 border-dashed border-bdr rounded-2xl p-8 md:p-10 text-center w-full max-w-sm transition-all duration-300">
             <div class="text-4xl mb-3 opacity-40">📄</div>
             <p class="text-sm text-mt">Drag your CRM export here</p>
             <div id="uf" class="inline-flex items-center gap-2 bg-white border border-bdr rounded-lg px-4 py-2.5 text-sm font-semibold mt-4 opacity-0 translate-y-2 transition-all duration-500">
-              <span class="text-gn">📊</span> hubspot-export-q4.csv
+              <span class="text-gn">📊</span> hubspot-deals-2025.csv
             </div>
             <div class="flex gap-2 mt-3 justify-center flex-wrap">
-              <span id="t1" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">4 columns detected</span>
-              <span id="t2" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">1,029 deals found</span>
+              <span id="t1" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">6 columns mapped</span>
+              <span id="t2" class="text-gn text-[11px] font-semibold px-2.5 py-1 rounded-md bg-gn-bg opacity-0 transition-all duration-300">1,247 deals found</span>
             </div>
           </div>
         </div>
 
-        <!-- Step 1: Processing -->
+        <!-- ─── Step 1: Processing ─── -->
         <div class="demo-step" data-step="1">
-          <p class="text-base font-bold mb-5">Analyzing your pipeline...</p>
-          <div class="text-left max-w-[280px] space-y-2" id="pl">
-            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Mapping stages</div>
-            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Calculating conversions</div>
-            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Building cohorts</div>
-            <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-500"><span class="text-gn font-bold">✓</span> Generating diagnostics</div>
-          </div>
-        </div>
-
-        <!-- Step 2: Dashboard -->
-        <div class="demo-step" data-step="2">
-          <div class="grid grid-cols-3 gap-2.5 w-full max-w-lg" id="kg">
-            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="1029">
-              <div class="kv text-xl font-extrabold tracking-tight tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Total Deals</div>
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-ac/10 mb-4">
+              <svg class="w-5 h-5 text-ac animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4m0 12v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M2 12h4m12 0h4m-3.93 7.07l-2.83-2.83M6.34 6.34L3.51 3.51"/></svg>
             </div>
-            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="91">
-              <div class="kv text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Won</div>
-            </div>
-            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="822">
-              <div class="kv text-xl font-extrabold tracking-tight text-rd tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Lost</div>
-            </div>
-            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="10" data-s="%">
-              <div class="kv text-xl font-extrabold tracking-tight text-ac tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Win Rate</div>
-              <div class="h-1.5 bg-gray-100 rounded-full mt-1.5 overflow-hidden"><div id="wr" class="h-full rounded-full bg-gradient-to-r from-gn-light to-pk w-0 transition-all duration-1000"></div></div>
-            </div>
-            <div class="kp bg-white border border-bdr rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="795" data-p="$" data-s="k">
-              <div class="kv text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt mt-0.5">Revenue</div>
-            </div>
-            <div class="kp bg-ac rounded-lg p-3.5 text-center opacity-0 scale-90 transition-all duration-500" data-v="70" data-s=" days">
-              <div class="kv text-xl font-extrabold tracking-tight text-white tabular-nums">0</div>
-              <div class="text-[9px] font-semibold tracking-[.06em] uppercase text-white/70 mt-0.5">Median Cycle</div>
+            <p class="text-base font-bold mb-5">Analyzing your pipeline...</p>
+            <div class="text-left max-w-[300px] mx-auto space-y-2.5" id="pl">
+              <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-400"><svg class="w-4 h-4 text-gn shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Mapping columns to fields</div>
+              <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-400"><svg class="w-4 h-4 text-gn shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Classifying Won / Lost / Open</div>
+              <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-400"><svg class="w-4 h-4 text-gn shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Computing stage conversions</div>
+              <div class="pi flex items-center gap-2.5 text-sm text-mt opacity-0 -translate-x-2 transition-all duration-400"><svg class="w-4 h-4 text-gn shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Generating 5 reports</div>
             </div>
           </div>
         </div>
 
-        <!-- Step 3: Stage Journey -->
-        <div class="demo-step" data-step="3">
-          <div class="w-full max-w-lg" id="fn">
-            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="52" data-p="38" data-o="10">
-              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Qualification</div>
-              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
-              <div class="text-[13px] font-bold w-12 text-right shrink-0">72.3%</div>
+        <!-- ─── Step 2: Dashboard Summary ─── -->
+        <div class="demo-step step-top" data-step="2">
+          <div class="w-full max-w-lg px-1 md:px-3" id="kg">
+            <!-- Row 1: 4 KPIs -->
+            <div class="grid grid-cols-4 gap-1.5 md:gap-2 mb-1.5 md:mb-2">
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="1247" data-delay="0">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Total Deals</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight tabular-nums">0</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="156" data-delay="1">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Won</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="943" data-delay="2">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Lost</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight text-rd tabular-nums">0</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 row-span-2" data-v="14" data-s="%" data-delay="3">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Win Rate</div>
+                <div class="kv text-xl md:text-2xl font-extrabold tracking-tight text-ac tabular-nums">0</div>
+                <div class="h-2 rounded-full mt-2 overflow-hidden flex">
+                  <div id="wr-g" class="h-full bg-gn rounded-l-full transition-all duration-1000 ease-out" style="width:0"></div>
+                  <div id="wr-r" class="h-full bg-rd rounded-r-full transition-all duration-1000 ease-out" style="width:0"></div>
+                </div>
+                <div class="flex justify-between mt-1">
+                  <span class="text-[7px] font-semibold text-gn">156 won</span>
+                  <span class="text-[7px] font-semibold text-rd">943 lost</span>
+                </div>
+              </div>
             </div>
-            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="38" data-p="50" data-o="12">
-              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">SQO</div>
-              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
-              <div class="text-[13px] font-bold w-12 text-right shrink-0">52.5%</div>
+            <!-- Row 2: 3 KPIs -->
+            <div class="grid grid-cols-4 gap-1.5 md:gap-2 mb-1.5 md:mb-2">
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="1200" data-p="$" data-s="k" data-delay="4">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Revenue Won</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight text-gn tabular-nums">0</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="8" data-p="$" data-s="k" data-delay="5">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Avg. Ticket</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight tabular-nums">0</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-lg p-2 md:p-3 text-center" data-v="148" data-delay="6">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-mt mb-0.5">Open</div>
+                <div class="kv text-lg md:text-xl font-extrabold tracking-tight tabular-nums">0</div>
+              </div>
+              <div class="hidden md:block"></div>
             </div>
-            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="28" data-p="58" data-o="14">
-              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Negotiation</div>
-              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
-              <div class="text-[13px] font-bold w-12 text-right shrink-0 text-rd">35.9%</div>
+            <!-- Row 3: Cycle + Trend -->
+            <div class="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-1.5 md:gap-2">
+              <div class="kp-anim bg-ac rounded-xl p-3 text-center" data-v="47" data-delay="7">
+                <div class="text-[8px] font-semibold tracking-[.06em] uppercase text-white/70 mb-0.5">Median Cycle</div>
+                <div class="kv text-2xl md:text-3xl font-extrabold text-white tabular-nums">0</div>
+                <div class="text-[10px] font-bold text-white/80">days</div>
+              </div>
+              <div class="kp-anim bg-white border border-bdr rounded-xl p-2.5 md:p-3" data-delay="8">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold text-tx">Won deals / month</span>
+                  <div class="flex gap-0.5">
+                    <span class="text-[8px] font-semibold px-1.5 py-0.5 rounded bg-white border border-bdr text-mt">Count</span>
+                    <span class="text-[8px] font-semibold px-1.5 py-0.5 rounded bg-ac text-white">Revenue</span>
+                  </div>
+                </div>
+                <svg class="w-full" viewBox="0 0 300 52" id="sparkline">
+                  <line x1="0" y1="48" x2="300" y2="48" stroke="#E8E4DF" stroke-width=".5"/>
+                  <line x1="0" y1="32" x2="300" y2="32" stroke="#E8E4DF" stroke-width=".3" stroke-dasharray="3"/>
+                  <line x1="0" y1="16" x2="300" y2="16" stroke="#E8E4DF" stroke-width=".3" stroke-dasharray="3"/>
+                  <path class="chart-line" d="M5,46 L25,44 L50,42 L75,40 L100,38 L125,36 L150,37 L175,32 L200,28 L225,22 L250,16 L275,10 L295,6" stroke="#E86C3A" stroke-width="2"/>
+                </svg>
+              </div>
             </div>
-            <div class="fr flex items-center gap-2.5 mb-2 opacity-0 -translate-x-4 transition-all duration-500" data-g="36" data-p="48" data-o="16">
-              <div class="text-[9px] font-semibold w-[68px] text-right text-tx2 uppercase tracking-wide shrink-0">Commit</div>
-              <div class="flex-1 h-7 rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn-light"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-gray-300"></div></div>
-              <div class="text-[13px] font-bold w-12 text-right shrink-0">46.9%</div>
-            </div>
-            <div id="fw" class="flex justify-center mt-3 opacity-0 transition-opacity duration-500"><span class="bg-gn text-white text-xs font-bold px-4 py-1.5 rounded-lg">91 WON · $795k</span></div>
-            <div id="fd" class="bg-ac-light border border-ac/15 rounded-xl p-3.5 mt-3 text-xs text-tx2 leading-relaxed opacity-0 transition-opacity duration-500">Biggest drop at <strong class="text-rd font-bold">Negotiation</strong> with only <strong class="text-rd font-bold">35.9%</strong> conversion — main bottleneck identified.</div>
           </div>
         </div>
 
-        <!-- Step 4: Cohort -->
-        <div class="demo-step" data-step="4">
-          <div class="w-full max-w-lg overflow-x-auto" id="ct">
-            <table class="w-full text-xs">
-              <thead><tr class="border-b border-bdr"><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-left">Cohort</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2">Total</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-left">Pipeline</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2">Conv%</th><th class="text-[9px] font-semibold tracking-[.06em] uppercase text-mt py-1.5 px-2 text-right">Revenue</th></tr></thead>
-              <tbody>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Jan/26</td><td class="py-2 px-2 text-center">27</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:7%"></div><div class="bg-pk h-full" style="width:15%"></div><div class="bg-gray-200 h-full" style="width:78%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">33.3%</td><td class="py-2 px-2 text-right">$9k</td></tr>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Dec/25</td><td class="py-2 px-2 text-center">15</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:0%"></div><div class="bg-pk h-full" style="width:60%"></div><div class="bg-gray-200 h-full" style="width:40%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">0%</td><td class="py-2 px-2 text-right">$0</td></tr>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Nov/25</td><td class="py-2 px-2 text-center">21</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:27%"></div><div class="bg-pk h-full" style="width:50%"></div><div class="bg-gray-200 h-full" style="width:23%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">27.3%</td><td class="py-2 px-2 text-right">$46k</td></tr>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Oct/25</td><td class="py-2 px-2 text-center">20</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:0%"></div><div class="bg-pk h-full" style="width:85%"></div><div class="bg-gray-200 h-full" style="width:15%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">0%</td><td class="py-2 px-2 text-right">$0</td></tr>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Sep/25</td><td class="py-2 px-2 text-center">33</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:17%"></div><div class="bg-pk h-full" style="width:65%"></div><div class="bg-gray-200 h-full" style="width:18%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">16.7%</td><td class="py-2 px-2 text-right">$52k</td></tr>
-                <tr class="cr border-b border-bdr/50 opacity-0 translate-y-1 transition-all duration-300"><td class="py-2 px-2 font-semibold">Aug/25</td><td class="py-2 px-2 text-center">31</td><td class="py-2 px-2"><div class="flex h-3.5 rounded-sm overflow-hidden min-w-[90px]"><div class="bg-gn-light h-full" style="width:7%"></div><div class="bg-pk h-full" style="width:80%"></div><div class="bg-gray-200 h-full" style="width:13%"></div></div></td><td class="py-2 px-2 text-center text-pk font-bold">7.4%</td><td class="py-2 px-2 text-right">$18k</td></tr>
-              </tbody>
-            </table>
+        <!-- ─── Step 3: Stage Journey ─── -->
+        <div class="demo-step step-top" data-step="3">
+          <div class="w-full max-w-lg px-1 md:px-3" id="fn">
+            <!-- Alert banner -->
+            <div id="fn-alert" class="border-l-4 border-rd bg-red-50 rounded-r-lg p-2.5 md:p-3 mb-3 flex items-start gap-2 opacity-0 transition-all duration-500">
+              <div class="w-7 h-7 rounded-lg bg-rd/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[11px] md:text-xs font-bold leading-tight">Bottleneck detected: <span class="text-rd">Proposal</span></div>
+                <div class="text-[10px] text-tx2 leading-snug mt-0.5">Only <strong class="text-rd">47.1%</strong> of deals advance past this stage — <strong>384</strong> deals lost here.</div>
+              </div>
+              <div class="text-right shrink-0 pl-2">
+                <div class="text-[7px] uppercase tracking-wider text-mt font-semibold">Overall Conv</div>
+                <div class="text-lg md:text-xl font-extrabold text-gn leading-none">12.5%</div>
+              </div>
+            </div>
+
+            <!-- Funnel header -->
+            <div id="fn-head" class="flex items-center justify-between mb-2 px-0.5 opacity-0 transition-opacity duration-300">
+              <span class="text-[8px] uppercase tracking-[.08em] font-semibold text-mt">Conversion Funnel</span>
+              <div class="flex gap-1.5">
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-white border border-bdr text-tx2">1,247 deals</span>
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-gn-bg text-gn">156 won</span>
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-red-50 text-rd">943 lost</span>
+              </div>
+            </div>
+
+            <!-- Funnel rows -->
+            <div class="space-y-1.5">
+              <div class="fn-row" data-adv="74.7" data-lost="20.5" data-open="4.8">
+                <div class="flex items-center gap-2">
+                  <div class="w-[80px] md:w-[90px] text-right shrink-0">
+                    <div class="text-[10px] md:text-[11px] font-semibold text-tx truncate">Qualification</div>
+                    <div class="text-[8px] text-mt">2d avg</div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="funnel-bar"><div class="funnel-seg bg-[#6B7280]"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-[#FDE8E8]"></div></div>
+                  </div>
+                  <div class="w-14 text-right shrink-0">
+                    <div class="text-[11px] font-bold">1,247</div>
+                    <div class="text-[10px] font-bold text-gn">74.7%</div>
+                  </div>
+                </div>
+                <div class="flex ml-[88px] md:ml-[98px] gap-2 mt-0.5"><span class="text-[8px] text-mt">932 advanced</span><span class="text-[8px] text-pk font-medium">267 lost</span><span class="text-[8px] text-mt">48 open</span></div>
+              </div>
+
+              <div class="fn-row" data-adv="65.9" data-lost="25.1" data-open="9">
+                <div class="flex items-center gap-2">
+                  <div class="w-[80px] md:w-[90px] text-right shrink-0">
+                    <div class="text-[10px] md:text-[11px] font-semibold text-tx truncate">Discovery</div>
+                    <div class="text-[8px] text-mt">5d avg</div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="funnel-bar"><div class="funnel-seg bg-[#6B7280]"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-[#FDE8E8]"></div></div>
+                  </div>
+                  <div class="w-14 text-right shrink-0">
+                    <div class="text-[11px] font-bold">932</div>
+                    <div class="text-[10px] font-bold text-gn">65.9%</div>
+                  </div>
+                </div>
+                <div class="flex ml-[88px] md:ml-[98px] gap-2 mt-0.5"><span class="text-[8px] text-mt">614 advanced</span><span class="text-[8px] text-pk font-medium">234 lost</span><span class="text-[8px] text-mt">84 open</span></div>
+              </div>
+
+              <div class="fn-row" data-adv="47.1" data-lost="46.7" data-open="6.2">
+                <div class="flex items-center gap-2">
+                  <div class="w-[80px] md:w-[90px] text-right shrink-0">
+                    <div class="text-[10px] md:text-[11px] font-semibold text-rd truncate">Proposal</div>
+                    <div class="text-[8px] text-mt">8d avg</div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="funnel-bar"><div class="funnel-seg bg-[#6B7280]"></div><div class="funnel-seg bg-pk"></div><div class="funnel-seg bg-[#FDE8E8]"></div></div>
+                  </div>
+                  <div class="w-14 text-right shrink-0">
+                    <div class="text-[11px] font-bold">614</div>
+                    <div class="text-[10px] font-bold text-rd">47.1%</div>
+                  </div>
+                </div>
+                <div class="flex ml-[88px] md:ml-[98px] gap-2 mt-0.5"><span class="text-[8px] text-mt">289 advanced</span><span class="text-[8px] text-rd font-semibold">384 lost</span><span class="text-[8px] text-mt">38 open</span></div>
+              </div>
+
+              <!-- Won bar -->
+              <div class="fn-row" data-adv="100" data-lost="0" data-open="0">
+                <div class="flex items-center gap-2">
+                  <div class="w-[80px] md:w-[90px] text-right shrink-0">
+                    <div class="text-[10px] md:text-[11px] font-bold text-tx uppercase">Won</div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="h-[28px] rounded overflow-hidden flex bg-cream-dark"><div class="funnel-seg bg-gn"></div></div>
+                  </div>
+                  <div class="w-14 text-right shrink-0">
+                    <div class="text-[11px] font-bold text-gn">156</div>
+                    <div class="text-[10px] font-bold text-gn">$1.2M</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div id="fn-legend" class="flex gap-4 mt-3 justify-center opacity-0 transition-opacity duration-500">
+              <div class="flex items-center gap-1.5 text-[9px] text-tx2 font-medium"><div class="w-2.5 h-2.5 rounded-sm bg-[#6B7280]"></div>Advanced</div>
+              <div class="flex items-center gap-1.5 text-[9px] text-tx2 font-medium"><div class="w-2.5 h-2.5 rounded-sm bg-pk"></div>Lost</div>
+              <div class="flex items-center gap-1.5 text-[9px] text-tx2 font-medium"><div class="w-2.5 h-2.5 rounded-sm bg-[#FDE8E8]"></div>Open</div>
+            </div>
           </div>
         </div>
 
-        <!-- Step 5: Time Series -->
-        <div class="demo-step" data-step="5">
-          <div class="w-full max-w-lg">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-bold">Deals per month</span>
-              <div class="flex gap-1"><span class="text-[10px] font-semibold px-2.5 py-1 rounded-md bg-white border border-bdr text-tx2">Monthly</span><span class="text-[10px] font-semibold px-2.5 py-1 rounded-md bg-ac text-white">Cumulative</span></div>
+        <!-- ─── Step 4: Cohort Comparison ─── -->
+        <div class="demo-step step-top" data-step="4">
+          <div class="w-full max-w-lg px-1 md:px-3" id="ct">
+            <div class="text-[8px] uppercase tracking-[.08em] font-semibold text-mt mb-2">Comparison by Vintage</div>
+            <div class="overflow-x-auto -mx-1">
+              <table class="w-full text-[10px] md:text-xs min-w-[480px]">
+                <thead>
+                  <tr class="border-b border-bdr">
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1.5 text-left">Vintage</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-center">Deals</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-center" colspan="3">Stages (Conv%)</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-center">Won</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-center">Lost</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-center">Conv%</th>
+                    <th class="text-[8px] font-semibold tracking-[.05em] uppercase text-mt py-1.5 px-1 text-right">Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="co-row border-b border-bdr/50">
+                    <td class="py-2 px-1.5 font-semibold">Jan/26</td>
+                    <td class="py-2 px-1 text-center">49</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="59%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="90%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="67%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">2</td>
+                    <td class="py-2 px-1 text-center text-rd">18</td>
+                    <td class="py-2 px-1 text-center font-bold text-ac">10%</td>
+                    <td class="py-2 px-1 text-right font-medium">$15k</td>
+                  </tr>
+                  <tr class="co-row border-b border-bdr/50">
+                    <td class="py-2 px-1.5 font-semibold">Jan/25</td>
+                    <td class="py-2 px-1 text-center">41</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="61%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="36%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="56%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">4</td>
+                    <td class="py-2 px-1 text-center text-rd">36</td>
+                    <td class="py-2 px-1 text-center font-bold text-ac">10%</td>
+                    <td class="py-2 px-1 text-right font-medium">$57k</td>
+                  </tr>
+                  <tr class="co-row border-b border-bdr/50">
+                    <td class="py-2 px-1.5 font-semibold">Feb/25</td>
+                    <td class="py-2 px-1 text-center">36</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="83%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="67%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="42%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">8</td>
+                    <td class="py-2 px-1 text-center text-rd">27</td>
+                    <td class="py-2 px-1 text-center font-bold text-gn">22.9%</td>
+                    <td class="py-2 px-1 text-right font-medium">$59k</td>
+                  </tr>
+                  <tr class="co-row border-b border-bdr/50">
+                    <td class="py-2 px-1.5 font-semibold">Feb/24</td>
+                    <td class="py-2 px-1 text-center">25</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="68%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-rd transition-all duration-700" style="width:0" data-w="35%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-rd transition-all duration-700" style="width:0" data-w="17%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">1</td>
+                    <td class="py-2 px-1 text-center text-rd">24</td>
+                    <td class="py-2 px-1 text-center font-bold text-rd">4%</td>
+                    <td class="py-2 px-1 text-right font-medium">$15k</td>
+                  </tr>
+                  <tr class="co-row border-b border-bdr/50">
+                    <td class="py-2 px-1.5 font-semibold">Mar/25</td>
+                    <td class="py-2 px-1 text-center">28</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="71%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="75%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="29%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">4</td>
+                    <td class="py-2 px-1 text-center text-rd">23</td>
+                    <td class="py-2 px-1 text-center font-bold text-ac">14.8%</td>
+                    <td class="py-2 px-1 text-right font-medium">$39k</td>
+                  </tr>
+                  <tr class="co-row">
+                    <td class="py-2 px-1.5 font-semibold">Mar/24</td>
+                    <td class="py-2 px-1 text-center">25</td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-gn transition-all duration-700" style="width:0" data-w="76%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="53%"></div></div></td>
+                    <td class="py-2 px-0.5"><div class="h-3 w-12 rounded-sm overflow-hidden bg-cream-dark"><div class="co-bar h-full bg-ac transition-all duration-700" style="width:0" data-w="40%"></div></div></td>
+                    <td class="py-2 px-1 text-center font-medium text-gn">4</td>
+                    <td class="py-2 px-1 text-center text-rd">21</td>
+                    <td class="py-2 px-1 text-center font-bold text-ac">16%</td>
+                    <td class="py-2 px-1 text-right font-medium">$53k</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <svg class="w-full" viewBox="0 0 520 200">
-              <line x1="40" y1="10" x2="40" y2="180" stroke="#E8E4DF"/><line x1="40" y1="180" x2="510" y2="180" stroke="#E8E4DF"/>
-              <line x1="40" y1="140" x2="510" y2="140" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
-              <line x1="40" y1="100" x2="510" y2="100" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
-              <line x1="40" y1="60" x2="510" y2="60" stroke="#E8E4DF" stroke-width=".5" stroke-dasharray="4"/>
-              <text x="70" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
-              <text x="150" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Apr</text>
-              <text x="250" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jul</text>
-              <text x="350" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Oct</text>
-              <text x="450" y="196" font-size="9" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
-              <path class="chart-line" d="M70,95 L110,105 L150,120 L190,90 L230,80 L270,75 L310,70 L350,85 L390,95 L430,100 L470,110 L490,130" stroke="#94A3B8"/>
-              <path class="chart-line" d="M70,110 L110,115 L150,130 L190,100 L230,95 L270,88 L310,82 L350,98 L390,105 L430,115 L470,125 L490,140" stroke="#E8837C"/>
-              <path class="chart-line" d="M70,165 L110,160 L150,155 L190,162 L230,158 L270,155 L310,160 L350,150 L390,145 L430,155 L470,160 L490,165" stroke="#4CAF78"/>
-              <path class="chart-line" d="M70,150 L110,145 L150,140 L190,148 L230,142 L270,138 L310,144 L350,130 L390,125 L430,140 L470,148 L490,155" stroke="#E86C3A" stroke-dasharray="6,4"/>
+          </div>
+        </div>
+
+        <!-- ─── Step 5: Time Series ─── -->
+        <div class="demo-step step-top" data-step="5">
+          <div class="w-full max-w-lg px-1 md:px-3">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] md:text-sm font-bold">Deals per month</span>
+              <div class="flex gap-0.5"><span class="text-[9px] font-semibold px-2.5 py-1 rounded-md bg-white border border-bdr text-mt">Monthly</span><span class="text-[9px] font-semibold px-2.5 py-1 rounded-md bg-ac text-white">Cumulative</span></div>
+            </div>
+            <svg class="w-full" viewBox="0 0 520 210">
+              <!-- Grid -->
+              <line x1="40" y1="10" x2="40" y2="185" stroke="#E8E4DF"/>
+              <line x1="40" y1="185" x2="510" y2="185" stroke="#E8E4DF"/>
+              <line x1="40" y1="145" x2="510" y2="145" stroke="#E8E4DF" stroke-width=".4" stroke-dasharray="4"/>
+              <line x1="40" y1="105" x2="510" y2="105" stroke="#E8E4DF" stroke-width=".4" stroke-dasharray="4"/>
+              <line x1="40" y1="65" x2="510" y2="65" stroke="#E8E4DF" stroke-width=".4" stroke-dasharray="4"/>
+              <line x1="40" y1="25" x2="510" y2="25" stroke="#E8E4DF" stroke-width=".4" stroke-dasharray="4"/>
+              <!-- Y labels -->
+              <text x="35" y="188" font-size="8" fill="#9B9590" text-anchor="end" font-family="Plus Jakarta Sans">0</text>
+              <text x="35" y="148" font-size="8" fill="#9B9590" text-anchor="end" font-family="Plus Jakarta Sans">300</text>
+              <text x="35" y="108" font-size="8" fill="#9B9590" text-anchor="end" font-family="Plus Jakarta Sans">600</text>
+              <text x="35" y="68" font-size="8" fill="#9B9590" text-anchor="end" font-family="Plus Jakarta Sans">900</text>
+              <text x="35" y="28" font-size="8" fill="#9B9590" text-anchor="end" font-family="Plus Jakarta Sans">1.2k</text>
+              <!-- X labels -->
+              <text x="65" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
+              <text x="135" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Apr</text>
+              <text x="215" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jul</text>
+              <text x="300" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Oct</text>
+              <text x="380" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Jan</text>
+              <text x="460" y="200" font-size="8" fill="#9B9590" text-anchor="middle" font-family="Plus Jakarta Sans">Apr</text>
+              <!-- Right Y axis for Conv% -->
+              <text x="515" y="188" font-size="8" fill="#9B9590" text-anchor="start" font-family="Plus Jakarta Sans">0</text>
+              <text x="515" y="108" font-size="8" fill="#9B9590" text-anchor="start" font-family="Plus Jakarta Sans">50</text>
+              <text x="515" y="28" font-size="8" fill="#9B9590" text-anchor="start" font-family="Plus Jakarta Sans">100</text>
+              <!-- Lines (cumulative view - climbing curves) -->
+              <path class="chart-line" d="M50,178 C80,176 100,172 130,168 S180,158 215,148 S260,135 300,120 S340,108 380,90 S420,68 460,45 S490,30 505,22" stroke="#94A3B8" stroke-width="2.5"/>
+              <path class="chart-line" d="M50,180 C80,178 100,175 130,170 S180,163 215,155 S260,145 300,132 S340,122 380,108 S420,90 460,70 S490,56 505,48" stroke="#E8837C" stroke-width="2"/>
+              <path class="chart-line" d="M50,182 C80,181 100,180 130,178 S180,176 215,174 S260,172 300,168 S340,163 380,155 S420,144 460,130 S490,120 505,112" stroke="#4CAF78" stroke-width="2"/>
+              <path class="chart-line" d="M50,118 C80,115 100,118 130,112 S180,108 215,105 S260,100 300,95 S340,92 380,88 S420,82 460,75 S490,68 505,62" stroke="#E86C3A" stroke-width="1.5" stroke-dasharray="6,4"/>
             </svg>
-            <div class="flex gap-4 justify-center mt-3 flex-wrap">
-              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-gray-400"></div>New</div>
-              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-pk"></div>Lost</div>
-              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-gn-light"></div>Won</div>
-              <div class="flex items-center gap-1.5 text-[10px] text-tx2 font-medium"><div class="w-2 h-2 rounded-full bg-ac"></div>Conv %</div>
+            <div class="flex gap-3 md:gap-5 justify-center mt-2 flex-wrap">
+              <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-tx2 font-medium"><div class="w-3 h-[3px] rounded-full bg-gray-400"></div>New</div>
+              <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-tx2 font-medium"><div class="w-3 h-[3px] rounded-full bg-pk"></div>Lost</div>
+              <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-tx2 font-medium"><div class="w-3 h-[3px] rounded-full bg-gn-light"></div>Won</div>
+              <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-tx2 font-medium"><div class="w-3 h-0 border-t-[3px] border-dashed border-ac"></div>Conv %</div>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- Nav -->
       <div class="flex items-center justify-center gap-4 py-3 border-t border-bdr bg-white">
-        <button id="dr" class="text-[12px] font-semibold text-tx2 border border-bdr rounded-md px-4 py-2 hover:border-ac hover:text-ac transition-colors min-h-[44px]">↻ Replay</button>
+        <button id="dr" class="text-[11px] font-semibold text-tx2 border border-bdr rounded-md px-3 py-1 hover:border-ac hover:text-ac transition-colors">↻ Replay</button>
         <div class="flex gap-1.5 items-center" id="dd"></div>
-        <span class="text-[10px] font-semibold tracking-[.04em] uppercase text-mt w-20" id="dl">Upload</span>
+        <span class="text-[10px] font-semibold tracking-[.04em] uppercase text-mt w-24 text-center" id="dl">Upload</span>
       </div>
     </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════ BENEFITS ═══════════════════ -->
-<section class="py-16 md:py-24 px-5" id="benefits">
-  <div class="max-w-5xl mx-auto">
-    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">Why TheRevenue</p>
-    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-12 leading-tight">
-      Five reports. One upload. Zero setup.
-    </h2>
-
-    <div class="grid md:grid-cols-2 gap-5">
-      <!-- B1 -->
-      <div class="rv d1 bg-white border border-bdr rounded-2xl p-7 hlift">
-        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center mb-4">
-          <svg class="w-[18px] h-[18px] text-ac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </div>
-        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Know exactly where deals stall</h3>
-        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Stage Journey analysis shows conversion at every stage. You'll see the bottleneck in seconds — not after hours in Excel.</p>
-        <div class="bg-cream border border-bdr rounded-xl p-3 space-y-1">
-          <div class="h-2.5 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:52%"></div><div class="bg-pk" style="width:38%"></div><div class="bg-gray-200" style="width:10%"></div></div>
-          <div class="h-2.5 rounded-sm flex overflow-hidden w-3/4"><div class="bg-gn-light" style="width:38%"></div><div class="bg-pk" style="width:50%"></div><div class="bg-gray-200" style="width:12%"></div></div>
-          <div class="h-2.5 rounded-sm flex overflow-hidden w-1/2"><div class="bg-gn-light" style="width:28%"></div><div class="bg-pk" style="width:58%"></div><div class="bg-gray-200" style="width:14%"></div></div>
-          <div class="h-2.5 rounded-sm flex overflow-hidden w-1/3"><div class="bg-gn-light" style="width:36%"></div><div class="bg-pk" style="width:48%"></div><div class="bg-gray-200" style="width:16%"></div></div>
-        </div>
-      </div>
-
-      <!-- B2 -->
-      <div class="rv d2 bg-white border border-bdr rounded-2xl p-7 hlift">
-        <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-4">
-          <svg class="w-[18px] h-[18px] text-gn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Compare any cohort to any cohort</h3>
-        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Is this January better than last? Which segment converts best? One click. Real answer.</p>
-        <div class="bg-cream border border-bdr rounded-xl p-3 space-y-1.5">
-          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/26</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:7%"></div><div class="bg-pk" style="width:15%"></div><div class="bg-gray-200" style="width:78%"></div></div></div>
-          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/25</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:10%"></div><div class="bg-pk" style="width:85%"></div><div class="bg-gray-200" style="width:5%"></div></div></div>
-          <div class="flex items-center gap-2 text-[9px] text-tx2"><span class="w-9 font-semibold shrink-0">Jan/24</span><div class="flex-1 h-2 rounded-sm flex overflow-hidden"><div class="bg-gn-light" style="width:13%"></div><div class="bg-pk" style="width:82%"></div><div class="bg-gray-200" style="width:5%"></div></div></div>
-        </div>
-      </div>
-
-      <!-- B3 -->
-      <div class="rv d3 bg-white border border-bdr rounded-2xl p-7 hlift">
-        <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-4">
-          <svg class="w-[18px] h-[18px] text-gn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        </div>
-        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Read your entire operation in 1 minute</h3>
-        <p class="text-[13px] text-tx2 leading-relaxed mb-4">Total deals, win rate, median ticket, cycle time, revenue trend — all in one screen. A diagnosis to read, not a dashboard to build.</p>
-        <div class="bg-cream border border-bdr rounded-xl p-3"><div class="grid grid-cols-3 gap-1.5">
-          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight">1,029</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Deals</div></div>
-          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight text-ac">10%</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Win Rate</div></div>
-          <div class="text-center bg-white border border-bdr rounded-md py-2 px-1"><div class="text-sm font-extrabold tracking-tight text-gn">$795k</div><div class="text-[7px] font-semibold uppercase tracking-wider text-mt">Revenue</div></div>
-        </div></div>
-      </div>
-
-      <!-- B4 -->
-      <div class="rv d4 bg-white border border-bdr rounded-2xl p-7 hlift">
-        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center mb-4">
-          <svg class="w-[18px] h-[18px] text-ac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <h3 class="font-bold text-[15px] mb-1.5 tracking-tight">Upload a spreadsheet. That's it.</h3>
-        <p class="text-[13px] text-tx2 leading-relaxed mb-4">No OAuth. No CRM integration. No onboarding call. Export from HubSpot or Salesforce, drop the CSV, and your reports are ready.</p>
-        <div class="bg-cream border border-bdr rounded-xl p-3">
-          <div class="flex items-center justify-center gap-3 py-2 text-sm font-semibold text-tx2">📄 CSV <span class="text-lg text-ac">→</span> 📊 5 reports</div>
-          <div class="text-center text-[9px] font-bold text-ac mt-1">CSV to insights in under 60 seconds</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════ SCREENSHOTS ═══════════════════ -->
-<section class="py-16 md:py-24 px-5 bg-white border-y border-bdr" id="product">
-  <div class="max-w-5xl mx-auto">
-    <p class="rv text-[11px] font-bold tracking-[.1em] uppercase text-ac text-center mb-3">Product</p>
-    <h2 class="rv d1 text-[clamp(22px,3.5vw,36px)] font-extrabold tracking-tight text-center mb-3 leading-tight">Five reports generated automatically</h2>
-    <p class="rv d2 text-center text-[15px] text-tx2 mb-12 max-w-lg mx-auto">From a single CSV upload, TheRevenue generates the five views your CRM can't — ready to read, not to build.</p>
-
-    <div class="rv d3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
-        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
-          <div class="text-center p-6"><div class="text-3xl mb-3">📊</div><div class="text-xs font-bold text-tx mb-1">Dashboard Resumo</div><div class="text-[10px] text-mt">KPIs, win rate, revenue, cycle time</div></div>
-          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
-        </div>
-      </div>
-      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
-        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
-          <div class="text-center p-6"><div class="text-3xl mb-3">🔍</div><div class="text-xs font-bold text-tx mb-1">Stage Journey</div><div class="text-[10px] text-mt">Funnel + bottleneck diagnosis</div></div>
-          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
-        </div>
-      </div>
-      <div class="group bg-cream border border-bdr rounded-2xl p-1.5 hlift">
-        <div class="bg-cream-dark rounded-xl aspect-[4/3] flex items-center justify-center relative overflow-hidden">
-          <div class="text-center p-6"><div class="text-3xl mb-3">📈</div><div class="text-xs font-bold text-tx mb-1">Cohort & Time Series</div><div class="text-[10px] text-mt">Compare periods, track trends</div></div>
-          <div class="absolute inset-0 bg-ac/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><span class="bg-ac text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-lg">Screenshot coming soon</span></div>
-        </div>
-      </div>
-    </div>
-
-    <p class="rv text-center text-[11px] text-mt mt-6 italic">Replace placeholders with real product screenshots</p>
   </div>
 </section>
 
@@ -585,16 +709,17 @@ tailwind.config = {
     </h2>
     <p class="rv d1 text-[15px] text-tx2 mb-8">Upload your CRM data. Get the diagnosis your Monday meeting needs.</p>
 
-    <div id="cta-form" class="rv d2 max-w-md mx-auto mb-6">
-      <div class="flex flex-col gap-2 sm:flex-row">
-        <input type="email" id="email" aria-label="Seu email" placeholder="Your work email"
-          class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-base font-medium placeholder:text-mt transition-all">
-        <a id="cta" href="https://app.revtrue.tech/login"
-          class="inline-flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
+    <form id="cta-form" class="rv d2 max-w-md mx-auto mb-6" onsubmit="return handleSubmit(event,'cta')">
+      <div class="flex gap-2">
+        <input type="email" id="cta-email" required placeholder="Your work email"
+          class="em-input flex-1 px-4 py-3.5 rounded-xl border border-bdr bg-white text-sm font-medium placeholder:text-mt transition-all">
+        <button type="submit" id="cta-btn"
+          class="bg-ac hover:bg-ac-hover text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all whitespace-nowrap shadow-[0_4px_16px_rgba(232,108,58,.25)] hover:shadow-[0_8px_24px_rgba(232,108,58,.35)] active:scale-[.97]">
           Get Free Diagnosis →
-        </a>
+        </button>
       </div>
-    </div>
+      <p id="cta-msg" class="text-xs mt-2 min-h-[18px]"></p>
+    </form>
 
     <div class="rv d3 flex flex-wrap items-center justify-center gap-5">
       <span class="flex items-center gap-1.5 text-xs font-semibold text-gn"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Free to start</span>
@@ -606,13 +731,13 @@ tailwind.config = {
 
 
 <!-- ═══════════════════ FOOTER ═══════════════════ -->
-<footer class="border-t border-bdr py-10 px-5" style="padding-bottom:calc(2.5rem + env(safe-area-inset-bottom))">
+<footer class="border-t border-bdr py-10 px-5">
   <div class="max-w-5xl mx-auto text-center">
     <a href="#" class="text-lg font-extrabold tracking-tight inline-block"><span class="text-tx">the</span><span class="text-ac">revenue</span></a>
     <div class="flex justify-center gap-6 mt-4">
-      <a href="#" class="text-sm text-mt hover:text-ac transition-colors py-1">Privacy Policy</a>
-      <a href="#" class="text-sm text-mt hover:text-ac transition-colors py-1">Terms</a>
-      <a href="mailto:hello@therevenue.com" class="text-sm text-mt hover:text-ac transition-colors py-1">Contact</a>
+      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Privacy Policy</a>
+      <a href="#" class="text-xs text-mt hover:text-ac transition-colors">Terms</a>
+      <a href="/cdn-cgi/l/email-protection#c3aba6afafac83b7aba6b1a6b5a6adb6a6eda0acae" class="text-xs text-mt hover:text-ac transition-colors">Contact</a>
     </div>
     <p class="text-[11px] text-mt mt-3">© 2025 TheRevenue. All rights reserved.</p>
   </div>
@@ -620,13 +745,13 @@ tailwind.config = {
 
 
 <!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
-<div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm" style="padding-bottom:calc(0.75rem + env(safe-area-inset-bottom))">
-  <a href="https://app.revtrue.tech/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
+<div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
+  <a href="#cta-final" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
 </div>
 
 
 <!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ——— Scroll Reveal ——— */
 const ro = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('vis');ro.unobserve(e.target)} }), {threshold:.1});
 document.querySelectorAll('.rv').forEach(el => ro.observe(el));
@@ -638,28 +763,57 @@ new IntersectionObserver(([e]) => smEl.classList.toggle('show',!e.isIntersecting
 /* ——— FAQ ——— */
 function togFaq(btn){const i=btn.closest('.faq-item'),o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open')}
 
-/* ——— CTA Email Prefill ——— */
-const APP_LOGIN = 'https://app.revtrue.tech/login';
-
-function setupEmailLink(inputId, linkId) {
-  const input = document.getElementById(inputId);
-  const link = document.getElementById(linkId);
-  if (!input || !link) return;
-  input.addEventListener('input', function() {
-    const email = this.value.trim();
-    link.href = email ? APP_LOGIN + '?email=' + encodeURIComponent(email) : APP_LOGIN;
-  });
+/* ——— Email Validation ——— */
+function handleSubmit(e,id){
+  e.preventDefault();
+  const inp=document.getElementById(id+'-email'), msg=document.getElementById(id+'-msg'), btn=document.getElementById(id+'-btn');
+  const v=inp.value.trim();
+  msg.textContent=''; msg.className='text-xs mt-2 min-h-[18px]';
+  // format
+  if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){
+    msg.textContent='Please enter a valid email address.';
+    msg.classList.add('text-rd','font-medium');
+    inp.style.borderColor='#D94F3D';
+    setTimeout(()=>inp.style.borderColor='',2000);
+    return false;
+  }
+  // block personal
+  const bl=['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','live.com','msn.com','protonmail.com'];
+  const dom=v.split('@')[1]?.toLowerCase();
+  if(bl.includes(dom)){
+    msg.textContent='Please use your work email for access.';
+    msg.classList.add('text-ac','font-medium');
+    return false;
+  }
+  // success
+  msg.innerHTML='<span class="text-gn font-semibold">✓ We\'ll send your access link shortly!</span>';
+  inp.value=''; inp.disabled=true;
+  btn.textContent='Sent ✓'; btn.disabled=true; btn.classList.add('opacity-60','cursor-default');
+  return false;
 }
 
-setupEmailLink('hero-email', 'hero-cta');
-setupEmailLink('email', 'cta');
-
 /* ——— Demo Engine ——— */
-const STP=[{n:'Upload',d:2600},{n:'Processing',d:2200},{n:'Dashboard',d:2600},{n:'Stage Journey',d:3000},{n:'Cohorts',d:2200},{n:'Time Series',d:2600}];
+const STP=[
+  {n:'Upload',d:2800,tab:null},
+  {n:'Processing',d:2400,tab:null},
+  {n:'Dashboard',d:3200,tab:'summary'},
+  {n:'Stage Journey',d:3600,tab:'stagejourney'},
+  {n:'Cohort Comparison',d:3000,tab:'stagejourney'},
+  {n:'Time Series',d:3000,tab:'timeseries'}
+];
 let cs=0,dt=null,ds=false;
-const dl=document.getElementById('dl'),dd=document.getElementById('dd');
+const dl=document.getElementById('dl'),dd=document.getElementById('dd'),dtabs=document.getElementById('dtabs');
 
 STP.forEach((_,i)=>{const d=document.createElement('div');d.className='h-2 rounded-full cursor-pointer transition-all duration-200 '+(i===0?'w-6 bg-ac':'w-2 bg-bdr');d.onclick=()=>go(i);dd.appendChild(d)});
+
+function showTabs(tabKey){
+  if(!tabKey){dtabs.style.display='none';dtabs.style.opacity='0';return;}
+  dtabs.style.display='flex';
+  requestAnimationFrame(()=>dtabs.style.opacity='1');
+  document.querySelectorAll('.dtab').forEach(t=>{
+    t.classList.toggle('dtab-on',t.dataset.t===tabKey);
+  });
+}
 
 function go(i){
   clearTimeout(dt); cs=i;
@@ -667,55 +821,99 @@ function go(i){
   [...dd.children].forEach((d,x)=>{d.className='h-2 rounded-full cursor-pointer transition-all duration-200 '+(x===i?'w-6 bg-ac':'w-2 bg-bdr')});
   document.querySelector(`.demo-step[data-step="${i}"]`).classList.add('active');
   dl.textContent=STP[i].n;
+  showTabs(STP[i].tab);
   anim(i);
   if(i<STP.length-1) dt=setTimeout(()=>go(i+1),STP[i].d);
 }
 
 function anim(i){
+  /* Step 0: Upload */
   if(i===0){
     const z=document.getElementById('uz'),f=document.getElementById('uf'),a=document.getElementById('t1'),b=document.getElementById('t2');
     z.style.borderColor='';z.style.background='';f.style.opacity='0';f.style.transform='translateY(8px)';a.style.opacity='0';b.style.opacity='0';
     setTimeout(()=>{z.style.borderColor='#E86C3A';z.style.background='rgba(232,108,58,.03)'},300);
     setTimeout(()=>{f.style.opacity='1';f.style.transform='translateY(0)'},800);
     setTimeout(()=>a.style.opacity='1',1400);
-    setTimeout(()=>b.style.opacity='1',1700);
+    setTimeout(()=>b.style.opacity='1',1800);
   }
+  /* Step 1: Processing */
   if(i===1){
     const ps=document.querySelectorAll('#pl .pi');
     ps.forEach(p=>{p.style.opacity='0';p.style.transform='translateX(-8px)';p.style.color=''});
-    ps.forEach((p,x)=>setTimeout(()=>{p.style.opacity='1';p.style.transform='translateX(0)';p.style.color='#1A1A1A'},400+x*400));
+    ps.forEach((p,x)=>setTimeout(()=>{p.style.opacity='1';p.style.transform='translateX(0)';p.style.color='#1A1A1A'},400+x*450));
   }
+  /* Step 2: Dashboard */
   if(i===2){
-    const ks=document.querySelectorAll('#kg .kp');
-    ks.forEach(k=>{k.style.opacity='0';k.style.transform='scale(.9)'});
-    ks.forEach((k,x)=>setTimeout(()=>{
-      k.style.opacity='1';k.style.transform='scale(1)';
-      const v=+k.dataset.v,s=k.dataset.s||'',p=k.dataset.p||'';
-      cntUp(k.querySelector('.kv'),v,p,s,800);
-    },x*180));
-    setTimeout(()=>{const w=document.getElementById('wr');if(w)w.style.width='100%'},500);
+    const ks=document.querySelectorAll('#kg .kp-anim');
+    ks.forEach(k=>{k.classList.remove('vis2');const kv=k.querySelector('.kv');if(kv)kv.textContent='0'});
+    document.getElementById('wr-g').style.width='0';
+    document.getElementById('wr-r').style.width='0';
+    // Reset sparkline
+    const sp=document.querySelector('#sparkline .chart-line');
+    if(sp){sp.classList.remove('draw');sp.style.strokeDashoffset='1000';}
+
+    ks.forEach((k,x)=>{
+      const delay=parseInt(k.dataset.delay||0)*120;
+      setTimeout(()=>{
+        k.classList.add('vis2');
+        const kv=k.querySelector('.kv');
+        if(kv && k.dataset.v){
+          const v=+k.dataset.v, s=k.dataset.s||'', p=k.dataset.p||'';
+          cntUp(kv,v,p,s,900);
+        }
+      },200+delay);
+    });
+    setTimeout(()=>{
+      document.getElementById('wr-g').style.width='14.2%';
+      document.getElementById('wr-r').style.width='85.8%';
+    },600);
+    // Sparkline draw
+    setTimeout(()=>{
+      if(sp){sp.style.removeProperty('stroke-dashoffset');sp.classList.add('draw');}
+    },1200);
   }
+  /* Step 3: Stage Journey */
   if(i===3){
-    const rs=document.querySelectorAll('#fn .fr'),fw=document.getElementById('fw'),fd=document.getElementById('fd');
-    rs.forEach(r=>{r.style.opacity='0';r.style.transform='translateX(-16px)';r.querySelectorAll('.funnel-seg').forEach(s=>s.style.width='0')});
-    fw.style.opacity='0';fd.style.opacity='0';
-    rs.forEach((r,x)=>setTimeout(()=>{
-      r.style.opacity='1';r.style.transform='translateX(0)';
-      const ss=r.querySelectorAll('.funnel-seg');
-      ss[0].style.width=r.dataset.g+'%';ss[1].style.width=r.dataset.p+'%';ss[2].style.width=r.dataset.o+'%';
-    },x*350));
-    setTimeout(()=>fw.style.opacity='1',rs.length*350+200);
-    setTimeout(()=>fd.style.opacity='1',rs.length*350+600);
+    const alert=document.getElementById('fn-alert');
+    const head=document.getElementById('fn-head');
+    const legend=document.getElementById('fn-legend');
+    const rows=document.querySelectorAll('#fn .fn-row');
+    alert.style.opacity='0'; head.style.opacity='0'; legend.style.opacity='0';
+    rows.forEach(r=>{r.classList.remove('vis2');r.querySelectorAll('.funnel-seg').forEach(s=>s.style.width='0')});
+
+    setTimeout(()=>alert.style.opacity='1',200);
+    setTimeout(()=>head.style.opacity='1',500);
+
+    rows.forEach((r,x)=>{
+      setTimeout(()=>{
+        r.classList.add('vis2');
+        const segs=r.querySelectorAll('.funnel-seg');
+        if(r.dataset.adv!==undefined){
+          const a=parseFloat(r.dataset.adv),l=parseFloat(r.dataset.lost),o=parseFloat(r.dataset.open);
+          if(segs[0])segs[0].style.width=a+'%';
+          if(segs[1])segs[1].style.width=l+'%';
+          if(segs[2])segs[2].style.width=o+'%';
+        }
+      },700+x*400);
+    });
+    setTimeout(()=>legend.style.opacity='1',700+rows.length*400+200);
   }
+  /* Step 4: Cohort */
   if(i===4){
-    const rs=document.querySelectorAll('.cr');
-    rs.forEach(r=>{r.style.opacity='0';r.style.transform='translateY(4px)'});
-    rs.forEach((r,x)=>setTimeout(()=>{r.style.opacity='1';r.style.transform='translateY(0)'},x*150));
+    const rows=document.querySelectorAll('#ct .co-row');
+    rows.forEach(r=>{r.classList.remove('vis2');r.querySelectorAll('.co-bar').forEach(b=>b.style.width='0')});
+    rows.forEach((r,x)=>{
+      setTimeout(()=>{
+        r.classList.add('vis2');
+        r.querySelectorAll('.co-bar').forEach(b=>{b.style.width=b.dataset.w});
+      },200+x*180);
+    });
   }
+  /* Step 5: Time Series */
   if(i===5){
-    const ls=document.querySelectorAll('.chart-line');
+    const ls=document.querySelectorAll('.demo-step[data-step="5"] .chart-line');
     ls.forEach(l=>{l.classList.remove('draw');l.style.strokeDashoffset='1000'});
-    setTimeout(()=>ls.forEach((l,x)=>setTimeout(()=>l.classList.add('draw'),x*200)),200);
+    setTimeout(()=>ls.forEach((l,x)=>setTimeout(()=>{l.style.removeProperty('stroke-dashoffset');l.classList.add('draw')},x*250)),300);
   }
 }
 
@@ -723,7 +921,8 @@ function cntUp(el,t,p,s,dur){
   const st=performance.now();
   (function tick(now){
     const pr=Math.min((now-st)/dur,1);
-    el.textContent=p+Math.round(t*pr).toLocaleString()+s;
+    const ease=1-Math.pow(1-pr,3);
+    el.textContent=p+Math.round(t*ease).toLocaleString()+s;
     if(pr<1)requestAnimationFrame(tick);
   })(st);
 }
@@ -732,6 +931,7 @@ function cntUp(el,t,p,s,dur){
 const db=document.getElementById('demo-browser');
 new IntersectionObserver(([e])=>{if(e.isIntersecting&&!ds){ds=true;setTimeout(()=>go(0),300)}},{threshold:.25}).observe(db);
 document.getElementById('dr').onclick=()=>{ds=true;go(0)};
+
 </script>
 </body>
 </html>
