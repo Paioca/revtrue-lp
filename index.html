@@ -133,7 +133,7 @@ tailwind.config = {
       <a href="#demo" class="hover:text-ac transition-colors">How It Works</a>
       <a href="#faq" class="hover:text-ac transition-colors">FAQ</a>
     </nav>
-    <a href="https://app.revtrue.com/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm">
+    <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.com')+'/login';return false" href="https://app.revtrue.com/login" class="bg-ac hover:bg-ac-hover text-white text-[13px] font-bold px-5 py-2 rounded-lg transition-colors shadow-sm cursor-pointer">
       Get Free Demo →
     </a>
   </div>
@@ -746,12 +746,13 @@ tailwind.config = {
 
 <!-- ═══════════════════ STICKY MOBILE ═══════════════════ -->
 <div class="sticky-mob fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-xl border-t border-bdr p-3 md:hidden" id="sm">
-  <a href="https://app.revtrue.com/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
+  <a onclick="window.location.href=(window.location.hostname==='localhost'?'http://localhost:3000':'https://app.revtrue.com')+'/login';return false" href="https://app.revtrue.com/login" class="flex items-center justify-center bg-ac hover:bg-ac-hover text-white font-bold py-3 rounded-xl text-sm transition-colors w-full active:scale-[.97]">Get Your Free Pipeline Diagnosis →</a>
 </div>
 
 
 <!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 /* ——— Scroll Reveal ——— */
 const ro = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('vis');ro.unobserve(e.target)} }), {threshold:.1});
 document.querySelectorAll('.rv').forEach(el => ro.observe(el));
@@ -764,7 +765,7 @@ new IntersectionObserver(([e]) => smEl.classList.toggle('show',!e.isIntersecting
 function togFaq(btn){const i=btn.closest('.faq-item'),o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open')}
 
 /* ——— Email Capture → Redirect to App Login ——— */
-var APP_LOGIN='https://app.revtrue.com/login';
+var APP_LOGIN=window.location.hostname==='localhost'?'http://localhost:3000/login':'https://app.revtrue.com/login';
 function handleSubmit(e,id){
   e.preventDefault();
   var inp=document.getElementById(id+'-email'), msg=document.getElementById(id+'-msg');
